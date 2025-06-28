@@ -5,11 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repositories
 {
-    public class BaseIdentityDbContext : IdentityDbContext<User,Role, Guid>
+    public class SWD392_G3DBcontext : IdentityDbContext<User,Role, Guid>
     {
-        public BaseIdentityDbContext(DbContextOptions<BaseIdentityDbContext> options) : base(options)
+        public SWD392_G3DBcontext(DbContextOptions<SWD392_G3DBcontext> options) : base(options)
         {
         }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Staff> Staffs { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Manager> Managers { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderService> OrderServices { get; set; }
+        public DbSet<StaffSchedule> StaffSchedules { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

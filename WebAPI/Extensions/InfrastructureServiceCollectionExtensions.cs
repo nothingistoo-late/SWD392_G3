@@ -15,9 +15,9 @@ namespace WebAPI.Extensions
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
             // 2. DbContext và CORS
-            services.AddDbContext<BaseIdentityDbContext>(opt =>
+            services.AddDbContext<SWD392_G3DBcontext>(opt =>
                 opt.UseSqlServer(
-                    configuration.GetConnectionString("IdentityAuthentication"),
+                    configuration.GetConnectionString("SWD392_G3"),
                     sql => sql.MigrationsAssembly("Repositories")));
             services.AddCors(opt =>
             {
@@ -43,7 +43,7 @@ namespace WebAPI.Extensions
                 opts.Password.RequireUppercase = false;
                 opts.Password.RequiredLength = 4;
             })
-            .AddEntityFrameworkStores<BaseIdentityDbContext>()
+            .AddEntityFrameworkStores<SWD392_G3DBcontext>()
             .AddDefaultTokenProviders();
 
             var jwt = configuration.GetSection("JwtSettings").Get<JwtSettings>()

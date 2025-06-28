@@ -14,8 +14,8 @@ namespace Services.Helpers.Mapers
                 LastName = req.LastName,
                 Email = req.Email,
                 Gender = req.Gender.ToString(),
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
         }
 
@@ -27,8 +27,8 @@ namespace Services.Helpers.Mapers
                 LastName = req.LastName,
                 Email = req.Email,
                 Gender = req.Gender?.ToString(),
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
         }
 
@@ -40,8 +40,8 @@ namespace Services.Helpers.Mapers
                 FirstName = info.FirstName,
                 LastName = info.LastName,
                 Email = info.Email,
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
         }
 
@@ -52,7 +52,7 @@ namespace Services.Helpers.Mapers
             if (new EmailAddressAttribute().IsValid(req.Email)) user.Email = req.Email;
             if (!string.IsNullOrEmpty(req.PhoneNumbers)) user.PhoneNumber = req.PhoneNumbers;
             if (req.Gender != null) user.Gender = req.Gender.ToString();
-            user.UpdateAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
         }
 
         public static bool MergeGoogleInfo(this GoogleUserInfo info, User user)
@@ -70,7 +70,7 @@ namespace Services.Helpers.Mapers
             }
             if (changed)
             {
-                user.UpdateAt = DateTime.UtcNow;
+                user.UpdatedAt = DateTime.UtcNow;
             }
             return changed;
         }
@@ -87,8 +87,8 @@ namespace Services.Helpers.Mapers
                 Email = user.Email,
                 Gender = user.Gender,
                 PhoneNumbers = user.PhoneNumber,
-                CreateAt = user.CreateAt,
-                UpdateAt = user.UpdateAt,
+                CreateAt = user.CreatedAt,
+                UpdateAt = user.UpdatedAt,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 Roles = roles.ToList()
@@ -104,8 +104,8 @@ namespace Services.Helpers.Mapers
                 Email = user.Email,
                 Gender = user.Gender,
                 PhoneNumbers = user.PhoneNumber,
-                CreateAt = user.CreateAt,
-                UpdateAt = user.UpdateAt,
+                CreateAt = user.CreatedAt,
+                UpdateAt = user.UpdatedAt,
                 AccessToken = accessToken
             };
         }

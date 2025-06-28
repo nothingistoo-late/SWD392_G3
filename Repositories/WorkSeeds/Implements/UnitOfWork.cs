@@ -6,11 +6,11 @@ namespace Repositories.WorkSeeds.Implements
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly BaseIdentityDbContext _context;
+        private readonly SWD392_G3DBcontext _context;
         private readonly IUserRepository _userRepository;
         private bool _disposed;
 
-        public UnitOfWork(BaseIdentityDbContext context, IUserRepository userRepository)
+        public UnitOfWork(SWD392_G3DBcontext context, IUserRepository userRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));

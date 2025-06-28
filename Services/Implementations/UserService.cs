@@ -344,7 +344,7 @@ namespace Services.Implementations
             return await _unitOfWork.ExecuteTransactionAsync(async () =>
             {
                 UserMappings.ApplyUpdate(req, user);
-                user.UpdateAt = DateTime.UtcNow;
+                user.UpdatedAt = DateTime.UtcNow;
 
                 if (req.Roles?.Any() == true && _currentUserService.IsAdmin())
                     await _userManager.UpdateRolesAsync(user, req.Roles);
@@ -373,7 +373,7 @@ namespace Services.Implementations
             return await _unitOfWork.ExecuteTransactionAsync(async () =>
             {
                 UserMappings.ApplyUpdate(req, user);
-                user.UpdateAt = DateTime.UtcNow;
+                user.UpdatedAt = DateTime.UtcNow;
 
                 var upd = await _userManager.UpdateAsync(user);
                 if (!upd.Succeeded)

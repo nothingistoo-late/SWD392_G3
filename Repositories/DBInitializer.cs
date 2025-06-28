@@ -6,7 +6,7 @@ namespace Repositories
     public static class DBInitializer
     {
         public static async Task Initialize(
-            BaseIdentityDbContext context,
+            SWD392_G3DBcontext context,
             UserManager<User> userManager)
         {
             #region Seed Roles
@@ -37,8 +37,8 @@ namespace Repositories
                     LastName = "Trung",
                     Gender = "Male",
                     PhoneNumber = "0339381305",
-                    CreateAt = DateTime.UtcNow.AddHours(7),
-                    UpdateAt = DateTime.UtcNow.AddHours(7)
+                    CreatedAt = DateTime.UtcNow.AddHours(7),
+                    UpdatedAt = DateTime.UtcNow.AddHours(7)
                 };
                 await CreateUserAsync(userManager, admin, "string", "ADMIN");
 
@@ -51,8 +51,8 @@ namespace Repositories
                     LastName = "User",
                     Gender = "Female", // hoặc giá trị phù hợp
                     PhoneNumber = "0123456789",
-                    CreateAt = DateTime.UtcNow.AddHours(7),
-                    UpdateAt = DateTime.UtcNow.AddHours(7)
+                    CreatedAt = DateTime.UtcNow.AddHours(7),
+                    UpdatedAt = DateTime.UtcNow.AddHours(7)
                 };
                 await CreateUserAsync(userManager, staff, "string", "USER");    
 
@@ -68,8 +68,8 @@ namespace Repositories
                         Gender = "Male",
                         PhoneNumber = "0123456789",
                         EmailConfirmed = true,
-                        CreateAt = DateTime.UtcNow.AddHours(7),
-                        UpdateAt = DateTime.UtcNow.AddHours(7)
+                        CreatedAt = DateTime.UtcNow.AddHours(7),
+                        UpdatedAt = DateTime.UtcNow.AddHours(7)
                     },
                     new User
                     {
@@ -80,8 +80,8 @@ namespace Repositories
                         Gender = "Male",
                         PhoneNumber = "0123456789",
                         EmailConfirmed = true,
-                        CreateAt = DateTime.UtcNow.AddHours(7),
-                        UpdateAt = DateTime.UtcNow.AddHours(7)
+                        CreatedAt = DateTime.UtcNow.AddHours(7),
+                        UpdatedAt = DateTime.UtcNow.AddHours(7)
                     },
                     new User
                     {
@@ -92,8 +92,8 @@ namespace Repositories
                         Gender = "Male",
                         PhoneNumber = "0123456789",
                         EmailConfirmed = true,
-                        CreateAt = DateTime.UtcNow.AddHours(7),
-                        UpdateAt = DateTime.UtcNow.AddHours(7)
+                        CreatedAt = DateTime.UtcNow.AddHours(7),
+                        UpdatedAt = DateTime.UtcNow.AddHours(7)
                     },
                     new User
                     {
@@ -104,8 +104,8 @@ namespace Repositories
                         Gender = "Male",
                         PhoneNumber = "0123456789",
                         EmailConfirmed = true,
-                        CreateAt = DateTime.UtcNow.AddHours(7),
-                        UpdateAt = DateTime.UtcNow.AddHours(7)
+                        CreatedAt = DateTime.UtcNow.AddHours(7),
+                        UpdatedAt = DateTime.UtcNow.AddHours(7)
                     },
                     new User
                     {
@@ -116,8 +116,8 @@ namespace Repositories
                         Gender = "Male",
                         PhoneNumber = "0123456789",
                         EmailConfirmed = true,
-                        CreateAt = DateTime.UtcNow.AddHours(7),
-                        UpdateAt = DateTime.UtcNow.AddHours(7)
+                        CreatedAt = DateTime.UtcNow.AddHours(7),
+                        UpdatedAt = DateTime.UtcNow.AddHours(7)
                     },
                     new User
                     {
@@ -128,8 +128,8 @@ namespace Repositories
                         EmailConfirmed = true,
                         Gender = "Male",
                         PhoneNumber = "0123456789",
-                        CreateAt = DateTime.UtcNow.AddHours(7),
-                        UpdateAt = DateTime.UtcNow.AddHours(7)
+                        CreatedAt = DateTime.UtcNow.AddHours(7),
+                        UpdatedAt = DateTime.UtcNow.AddHours(7)
                     }
                 };
 

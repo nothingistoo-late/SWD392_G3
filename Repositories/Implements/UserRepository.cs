@@ -5,9 +5,9 @@ namespace Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly BaseIdentityDbContext _context;
+        private readonly SWD392_G3DBcontext _context;
 
-        public UserRepository(BaseIdentityDbContext context)
+        public UserRepository(SWD392_G3DBcontext context)
         {
             _context = context;
         }
@@ -21,7 +21,7 @@ namespace Repositories
 
             // Prepare efficient query for paged results
             var pagedUsers = await query
-                .OrderByDescending(u => u.CreateAt)
+                .OrderByDescending(u => u.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(u => new
@@ -57,8 +57,8 @@ namespace Repositories
                 LastName = u.User.LastName ?? string.Empty,
                 Email = u.User.Email ?? string.Empty,
                 Gender = u.User.Gender,
-                CreateAt = u.User.CreateAt,
-                UpdateAt = u.User.UpdateAt,
+                CreateAt = u.User.CreatedAt,
+                UpdateAt = u.User.UpdatedAt,
                 Roles = userRolesDict.TryGetValue(u.User.Id, out var roles) ? roles : new List<string>()
             }).ToList();
 

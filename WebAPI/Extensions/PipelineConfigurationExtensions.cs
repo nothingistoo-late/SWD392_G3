@@ -12,7 +12,7 @@ namespace WebAPI.Extensions
             {
                 var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                var db = scope.ServiceProvider.GetRequiredService<BaseIdentityDbContext>();
+                var db = scope.ServiceProvider.GetRequiredService<SWD392_G3DBcontext>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 try
                 {
