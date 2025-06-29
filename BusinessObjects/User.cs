@@ -34,7 +34,7 @@ namespace BusinessObjects
         public bool IsDeleted { get; set; }
 
         // Navigation đến thông tin phụ huynh và nhân viên (nullable nếu chưa gán)
-        public Customer? Customer { get; set; }
-        public Staff? StaffProfile { get; set; }
+        public virtual Customer? Customer { get; set; }
+        public virtual Staff? StaffProfile { get; set; }
     }
 }

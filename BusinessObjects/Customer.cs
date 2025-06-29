@@ -13,7 +13,7 @@ namespace BusinessObjects
         [Key, ForeignKey(nameof(User))]
         public Guid UserId { get; set; }
 
-        public User User { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
         public string Address { get; set; }
         public Membership Membership { get; set; }
 

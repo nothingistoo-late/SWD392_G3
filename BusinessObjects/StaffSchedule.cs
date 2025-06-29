@@ -15,7 +15,7 @@ namespace BusinessObjects
         public Guid StaffScheduleId { get; set; }
         [ForeignKey(nameof(Staff))]
         public Guid StaffId { get; set; }
-        public Staff Staff { get; set; } = null!;
+        public virtual Staff Staff { get; set; } = null!;
         // Additional properties or methods can be added as needed
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }

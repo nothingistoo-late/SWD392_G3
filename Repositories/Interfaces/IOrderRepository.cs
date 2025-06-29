@@ -8,6 +8,7 @@ namespace Repositories.Interfaces
 {
     public interface IOrderRepository : IGenericRepository<Order, Guid> 
     {
-
+        Task<List<Order>> GetAllWithCustomerAndServiceAsync();
+        Task<Order?> GetByIdWithDetailsAsync(Guid id);
     }
 }

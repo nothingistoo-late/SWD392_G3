@@ -14,10 +14,10 @@ namespace BusinessObjects
         public Guid OrderDetailId { get; set; }
 
         public Guid ServiceId { get; set; }
-        public Service Service { get; set; } = null!;
+        public virtual Service Service { get; set; } = null!;
 
         public Guid OrderId { get; set; }
-        public Order Order { get; set; } = null!;
+        public virtual Order Order { get; set; } = null!;
 
 
     }

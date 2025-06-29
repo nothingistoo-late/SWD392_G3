@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DTOs.OrderDTO.Request;
 using DTOs.OrderDTO.Respond;
+using Repositories.Implements;
 using Repositories.Interfaces;
 using Services.Commons;
 using System;
@@ -13,10 +14,13 @@ namespace Services.Implementations
 {
     public class OrderService : BaseService<Order, Guid>, IOrderService
     {
-        private readonly IMapper _mapper;
-        public OrderService(IMapper mapper, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
+        private readonly IMapper _mapper; 
+        private readonly IOrderRepository _orderRepository;
+
+        public OrderService(IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
         {
             _mapper = mapper;
+            _orderRepository = orderRepository;
         }
 
         public async Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequest request)
@@ -55,12 +59,7 @@ namespace Services.Implementations
         {
             try
             {
-                var orders = await _repository.GetAllAsync(
-                    predicate: null,
-                    orderBy: q => q.OrderByDescending(o => o.CreatedAt),
-                    includes: o => o.OrderDetails
-                );
-
+                var orders = await _orderRepository.GetAllWithCustomerAndServiceAsync();
                 var result = _mapper.Map<List<OrderRespondDTO>>(orders);
                 return ApiResult<List<OrderRespondDTO>>.Success(result, "Lấy tất cả đơn hàng thành công!");
             }
@@ -74,7 +73,7 @@ namespace Services.Implementations
         {
             try
             {
-                var order = await _repository.GetByIdAsync(Id, o => o.OrderDetails);
+                var order = await _orderRepository.GetByIdWithDetailsAsync(Id);
 
                 if (order == null)
                     return ApiResult<OrderRespondDTO>.Failure(new Exception("Không tìm thấy đơn hàng!"));
@@ -87,6 +86,7 @@ namespace Services.Implementations
                 return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi lấy đơn hàng: " + ex.Message));
             }
         }
+
 
         public async Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId)
         {
