@@ -12,8 +12,8 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(SWD392_G3DBcontext))]
-    [Migration("20250628155621_initialBaseDB")]
-    partial class initialBaseDB
+    [Migration("20250629042110_renameOrderService")]
+    partial class renameOrderService
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,13 +174,11 @@ namespace Repositories.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("BusinessObjects.OrderService", b =>
+            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
                 {
-                    b.Property<int>("OrderServiceId")
+                    b.Property<Guid>("OrderDetailId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderServiceId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -209,7 +207,7 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("OrderServiceId");
+                    b.HasKey("OrderDetailId");
 
                     b.HasIndex("OrderId");
 
@@ -263,7 +261,7 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("BusinessObjects.Service", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -302,7 +300,7 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Services");
                 });
@@ -643,16 +641,16 @@ namespace Repositories.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("BusinessObjects.OrderService", b =>
+            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
                 {
                     b.HasOne("BusinessObjects.Order", "Order")
-                        .WithMany()
+                        .WithMany("OrderServices")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObjects.Service", "Service")
-                        .WithMany()
+                        .WithMany("OrderServices")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -737,6 +735,16 @@ namespace Repositories.Migrations
                 {
                     b.Navigation("Membership")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BusinessObjects.Order", b =>
+                {
+                    b.Navigation("OrderServices");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Service", b =>
+                {
+                    b.Navigation("OrderServices");
                 });
 
             modelBuilder.Entity("BusinessObjects.User", b =>

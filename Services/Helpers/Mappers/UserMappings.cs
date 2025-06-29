@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace Services.Helpers.Mapers
+namespace Services.Helpers.Mappers
 {
     public static class UserMappings
     {

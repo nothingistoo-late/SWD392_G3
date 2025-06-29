@@ -66,14 +66,14 @@ namespace Services.Implementations
         public async Task<ApiResult<string>> GenerateToken(User user)
         {
             if (user == null)
-                return ApiResult<string>.Failure("User is null.");
+                return ApiResult<string>.Failure(new Exception("User is null."));
 
             var signingCredentials = new SigningCredentials(_secretKey, SecurityAlgorithms.HmacSha256);
             var claims = await GetClaimsAsync(user).ConfigureAwait(false);
             var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
             var token = _tokenHandler.WriteToken(tokenOptions);
 
-            return ApiResult<string>.Success(token);
+            return ApiResult<string>.Success(token, "Get token Successfully");
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Repositories
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderService> OrderServices { get; set; }
+        public DbSet<OrderDetail> OrderServices { get; set; }
         public DbSet<StaffSchedule> StaffSchedules { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

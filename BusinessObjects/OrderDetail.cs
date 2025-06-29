@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects
 {
-    public class OrderService : BaseEntity
+    public class OrderDetail : BaseEntity
     {
         [Key]
-        public int OrderServiceId { get; set; }
+        public Guid OrderDetailId { get; set; }
 
         public Guid ServiceId { get; set; }
         public Service Service { get; set; } = null!;

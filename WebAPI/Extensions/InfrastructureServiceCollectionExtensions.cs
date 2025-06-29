@@ -1,8 +1,10 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using Repositories.Implementations;
+using Repositories.Implements;
+using Services.Helpers.Mappers;
+using System.Text;
 
 namespace WebAPI.Extensions
 {
@@ -92,12 +94,17 @@ namespace WebAPI.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<ICurrentTime, CurrentTime>();
+
 
             services.AddScoped<ICurrentUserService, CurrentUserService>();
-            services.AddScoped<IExternalAuthService, ExternalAuthService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserEmailService, UserEmailService>();
+            services.AddScoped<IOrderService, OrderService>();  
+            services.AddScoped<IServiceService, ServiceService>();  
 
             // 5. Email + Quartz
             services.AddEmailServices(opts =>
@@ -107,6 +114,8 @@ namespace WebAPI.Extensions
             // 6. Controllers
             services.AddControllers();
 
+            // 7. Mapper
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
             return services;
         }
     }

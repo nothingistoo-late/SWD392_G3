@@ -9,4 +9,4 @@ global using Repositories.Helpers;
 global using Repositories.WorkSeeds.Interfaces;
 global using Services.Commons.Gmail;
 global using Services.Helpers;
-global using Services.Helpers.Mapers;
+global using Services.Helpers.Mappers;

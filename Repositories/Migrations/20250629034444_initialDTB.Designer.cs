@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(SWD392_G3DBcontext))]
-    partial class SWD392_G3DBcontextModelSnapshot : ModelSnapshot
+    [Migration("20250629034444_initialDTB")]
+    partial class initialDTB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,11 +174,13 @@ namespace Repositories.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
+            modelBuilder.Entity("BusinessObjects.OrderService", b =>
                 {
-                    b.Property<Guid>("OrderDetailId")
+                    b.Property<int>("OrderServiceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderServiceId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -204,7 +209,7 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("OrderDetailId");
+                    b.HasKey("OrderServiceId");
 
                     b.HasIndex("OrderId");
 
@@ -638,7 +643,7 @@ namespace Repositories.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
+            modelBuilder.Entity("BusinessObjects.OrderService", b =>
                 {
                     b.HasOne("BusinessObjects.Order", "Order")
                         .WithMany("OrderServices")
