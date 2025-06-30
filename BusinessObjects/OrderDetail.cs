@@ -19,6 +19,12 @@ namespace BusinessObjects
         public Guid OrderId { get; set; }
         public virtual Order Order { get; set; } = null!;
 
+        [ForeignKey(nameof(Staff))]
+        public Guid StaffId { get; set; }
+        public virtual Staff Staff { get; set; } = null!;
+        public DateTime ScheduleTime { get; set; }
+        public string? Note { get; set; } = null!;
+        public virtual Rating? Rating { get; set; }
 
     }
 }

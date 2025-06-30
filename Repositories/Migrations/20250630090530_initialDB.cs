@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class initialDTB : Migration
+    public partial class initialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,6 +39,7 @@ namespace Repositories.Migrations
                     Price = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
+                    imgURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -53,24 +54,37 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Staffs",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Salary = table.Column<double>(type: "float", nullable: false),
-                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsFirstLogin = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Staffs", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,79 +109,12 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StaffSchedules",
-                columns: table => new
-                {
-                    StaffScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StaffSchedules", x => x.StaffScheduleId);
-                    table.ForeignKey(
-                        name: "FK_StaffSchedules_Staffs_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsFirstLogin = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    StaffProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Staffs_StaffProfileId",
-                        column: x => x.StaffProfileId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    imgURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -206,6 +153,33 @@ namespace Repositories.Migrations
                     table.ForeignKey(
                         name: "FK_Managers_Users_UserId",
                         column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Staffs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Salary = table.Column<double>(type: "float", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Staffs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Staffs_Users_Id",
+                        column: x => x.Id,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -301,6 +275,7 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    imgURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MemberShip = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -331,6 +306,8 @@ namespace Repositories.Migrations
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<double>(type: "float", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -351,13 +328,14 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderServices",
+                name: "StaffSchedules",
                 columns: table => new
                 {
-                    OrderServiceId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaffScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -368,7 +346,36 @@ namespace Repositories.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderServices", x => x.OrderServiceId);
+                    table.PrimaryKey("PK_StaffSchedules", x => x.StaffScheduleId);
+                    table.ForeignKey(
+                        name: "FK_StaffSchedules_Staffs_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "Staffs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderServices",
+                columns: table => new
+                {
+                    OrderDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScheduleTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderServices", x => x.OrderDetailId);
                     table.ForeignKey(
                         name: "FK_OrderServices_Orders_OrderId",
                         column: x => x.OrderId,
@@ -380,7 +387,13 @@ namespace Repositories.Migrations
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderServices_Staffs_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "Staffs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -397,6 +410,11 @@ namespace Repositories.Migrations
                 name: "IX_OrderServices_ServiceId",
                 table: "OrderServices",
                 column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderServices_StaffId",
+                table: "OrderServices",
+                column: "StaffId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -434,11 +452,6 @@ namespace Repositories.Migrations
                 name: "EmailIndex",
                 table: "Users",
                 column: "NormalizedEmail");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_StaffProfileId",
-                table: "Users",
-                column: "StaffProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -485,6 +498,9 @@ namespace Repositories.Migrations
                 name: "Services");
 
             migrationBuilder.DropTable(
+                name: "Staffs");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
@@ -492,9 +508,6 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Staffs");
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Services.Implementations
         {
             try
             {
-                var services = await _repository.GetAllAsync();
+                var services = await _repository.GetAllAsync(s => !s.IsDeleted);
                 var serviceDTOs = _mapper.Map<List<ServiceRespondDTO>>(services);
                 return ApiResult<List<ServiceRespondDTO>>.Success(serviceDTOs, "Lấy danh sách dịch vụ thành công!!");
             }
@@ -58,6 +58,11 @@ namespace Services.Implementations
             try
             {
                 var service = await _repository.GetByIdAsync(Id);
+                if (service.IsDeleted)
+                {
+                    return ApiResult<ServiceRespondDTO>.Failure(new Exception("Không tìm thấy dịch vụ (có thể đã bị xóa)."));
+                }
+
                 if (service == null)
                 {
                     return ApiResult<ServiceRespondDTO>.Failure(new Exception("Không tìm thấy dịch vụ với Id: " + Id));
@@ -80,6 +85,11 @@ namespace Services.Implementations
                 {
                     return ApiResult<ServiceRespondDTO>.Failure(new Exception("Không tìm thấy dịch vụ với Id: " + serviceId));
                 }
+                if (service.IsDeleted)
+                {
+                    return ApiResult<ServiceRespondDTO>.Failure(new Exception("Dịch vụ này đã bị xóa trước đó."));
+                }
+
                 service.IsDeleted = true;
                 service.DeletedAt = _currentTime.GetVietnamTime();
                 service.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
@@ -97,6 +107,10 @@ namespace Services.Implementations
             try
             {
                 var service = await _repository.GetByIdAsync(request.Id);
+                if (service.IsDeleted)
+                {
+                    return ApiResult<ServiceRespondDTO>.Failure(new Exception("Dịch vụ đã bị xóa và không thể cập nhật."));
+                }
 
                 if (service == null)
                 {

@@ -12,20 +12,23 @@ namespace DTOs
     public class CreateCustomerRequestDTO
     {
 
-        [Required]
+        [Required(ErrorMessage = "Email là bắt buộc")]
         [EmailAddress]
         public string Email { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
         public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "FirstName là bắt buộc")]
         [MaxLength(100)]
         public string FirstName { get; set; }
 
+        [Required(ErrorMessage = "LastName là bắt buộc")]
         [MaxLength(100)]
         public string LastName { get; set; }
-
+        [Required(ErrorMessage = "giới tính là bắt buộc")]
+        [MaxLength(100)]
         public GenderEnums? Gender { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Địa chỉ là bắt buộc")]
         public string Address { get; set; } = string.Empty; 
 
 

@@ -17,9 +17,9 @@ namespace BusinessObjects
         public Guid StaffId { get; set; }
         public virtual Staff Staff { get; set; } = null!;
         // Additional properties or methods can be added as needed
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DayOfWeek DayOfWeek { get; set; }  // 👈 Làm vào thứ mấy
+        public TimeSpan StartTime { get; set; }   // 👈 Giờ bắt đầu
+        public TimeSpan EndTime { get; set; }     // 👈 Giờ kết thúc
         public string? Note { get; set; }
-        // Navigation properties
     }
 }

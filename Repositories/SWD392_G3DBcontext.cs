@@ -16,7 +16,7 @@ namespace Repositories
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderDetail> OrderServices { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<StaffSchedule> StaffSchedules { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +28,25 @@ namespace Repositories
             modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
             modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
             modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
+
+
+            modelBuilder.Entity<OrderDetail>()
+       .HasOne(od => od.Staff)
+       .WithMany(s => s.OrderDetails)
+       .HasForeignKey(od => od.StaffId)
+       .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.Service)
+                .WithMany(s => s.OrderDetails)
+                .HasForeignKey(od => od.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.Order)
+                .WithMany(o => o.OrderDetails)
+                .HasForeignKey(od => od.OrderId)
+                .OnDelete(DeleteBehavior.Cascade); // 👈 Giữ lại cascade 1 thằng thôi
         }
     }
 }

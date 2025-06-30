@@ -14,8 +14,12 @@ namespace BusinessObjects
         public Guid UserId { get; set; }
 
         public virtual User User { get; set; } = null!;
-        public string Address { get; set; }
+        public string Address { get; set; } = null!;
+        public string imgURL { get; set; } = null!;
         public Membership Membership { get; set; }
+        public virtual ICollection<Order>? Orders { get; set; } 
+
+
 
     }
 }

@@ -16,43 +16,125 @@ namespace Services.Implementations
     {
         private readonly IMapper _mapper; 
         private readonly IOrderRepository _orderRepository;
+        private readonly IServiceRepository _serviceRepository;
+        private readonly IStaffScheduleRepository _staffCheduleRepository;
+        private readonly IOrderDetailRepository _orderDetailRepo;
 
-        public OrderService(IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
+        public OrderService(IOrderDetailRepository orderDetailRepository, IStaffScheduleRepository staffCheduleRepository, IServiceRepository serviceRepository, IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
         {
             _mapper = mapper;
             _orderRepository = orderRepository;
+            _serviceRepository = serviceRepository;
+            _staffCheduleRepository = staffCheduleRepository;
+            _orderDetailRepo = orderDetailRepository;
         }
 
-        public async Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequest request)
+        public async Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequestDTO dto)
         {
+            await _unitOfWork.BeginTransactionAsync();
             try
             {
+                var customer = await _unitOfWork.UserRepository.GetUserDetailsByIdAsync(dto.CustomerId);
+                if (customer == null || customer.IsDeleted)
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception($"Khách hàng với ID {dto.CustomerId} không tồn tại."));
+
+                if (dto.OrderDate < _currentTime.GetVietnamTime())
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt hàng không được trong quá khứ."));
+
                 var order = new Order
                 {
                     Id = Guid.NewGuid(),
-                    CustomerId = request.CustomerId,
-                    OrderDate = request.OrderDate,
-                    CreatedAt = _currentTime.GetVietnamTime(),
-                    CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty,
-                    OrderDetails = request.ServiceIds.Select(sid => new OrderDetail
-                    {
-                        ServiceId = sid,
-                        CreatedAt = _currentTime.GetVietnamTime(),
-                        CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty
-                    }).ToList()
+                    CustomerId = dto.CustomerId,
+                    OrderDate = DateTime.Now,
+                    Status = OrderStatus.Pending,
+                    OrderDetails = new List<OrderDetail>()
                 };
 
-                await _repository.AddAsync(order);
-                await _unitOfWork.SaveChangesAsync();
+                double total = 0;
 
-                var dto = _mapper.Map<OrderRespondDTO>(order);
-                return ApiResult<OrderRespondDTO>.Success(dto, "Tạo đơn hàng thành công!");
+                foreach (var item in dto.Services)
+                {
+                    // 1. Get service info
+                    var service = await _serviceRepository.GetByIdAsync(item.ServiceId);
+                    if (service == null || service.IsDeleted)
+                        return ApiResult<OrderRespondDTO>.Failure(new Exception($"Dịch vụ với ID {item.ServiceId} không tồn tại."));
+
+                    var start = item.ScheduledTime;
+                    var end = start.AddMinutes(service.Duration);
+
+                    // 2. Find available staff
+                    var staff = await FindAvailableStaffAsync(service.Id, start, end);
+                    if (staff == null)
+                        return ApiResult<OrderRespondDTO>.Failure(new Exception($"Không tìm thấy nhân viên rảnh cho dịch vụ lúc {start:HH:mm dd/MM}"));
+
+                    // 3. Create OrderDetail (✅ nhớ gán ScheduleTime)
+                    order.OrderDetails.Add(new OrderDetail
+                    {
+                        OrderDetailId = Guid.NewGuid(),
+                        ServiceId = service.Id,
+                        ScheduleTime = start,
+                        StaffId = staff.Id,
+                        OrderId = order.Id
+                    });
+
+                    total += service.Price;
+                }
+
+                order.TotalPrice = total;
+
+                await CreateAsync(order);
+                await _unitOfWork.CommitTransactionAsync();
+
+                // ✅ Reload lại Order kèm navigation
+                var fullOrder = await _unitOfWork.OrderRepository.GetFullOrderByIdAsync(order.Id);
+
+                if (fullOrder == null)
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Không thể load lại đơn hàng sau khi tạo."));
+
+                var response = _mapper.Map<OrderRespondDTO>(fullOrder);
+                return ApiResult<OrderRespondDTO>.Success(response, "Tạo order thành công!!");
             }
             catch (Exception ex)
             {
-                return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi tạo đơn hàng: " + ex.Message));
+                await _unitOfWork.RollbackTransactionAsync();
+                return ApiResult<OrderRespondDTO>.Failure(new Exception("Đã có lỗi xảy ra khi tạo đơn hàng: " + ex.Message));
             }
         }
+
+
+
+        //public async Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequest request)
+        //{
+        //    try
+        //    {
+        //        var order = new Order
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            CustomerId = request.CustomerId,
+        //            OrderDate = request.OrderDate,
+        //            CreatedAt = _currentTime.GetVietnamTime(),
+        //            CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty,
+        //            OrderDetails = request.ServiceIds.Select(sid => new OrderDetail
+        //            {
+        //                ServiceId = sid,
+        //                CreatedAt = _currentTime.GetVietnamTime(),
+        //                CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty
+        //            }).ToList()
+        //        };
+
+        //        await _repository.AddAsync(order);
+        //        await _unitOfWork.SaveChangesAsync();
+
+        //        var dto = _mapper.Map<OrderRespondDTO>(order);
+        //        return ApiResult<OrderRespondDTO>.Success(dto, "Tạo đơn hàng thành công!");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi tạo đơn hàng: " + ex.Message));
+        //    }
+        //}
+
+
 
 
         public async Task<ApiResult<List<OrderRespondDTO>>> GetAllOrdersAsync()
@@ -113,7 +195,7 @@ namespace Services.Implementations
             }
         }
 
-        public async Task<ApiResult<OrderRespondDTO>> UpdateOrderById(UpdateOrderRequest request)
+        public async Task<ApiResult<OrderRespondDTO>> UpdateOrderById(UpdateOrderRequestDTO request)
         {
             try
             {
@@ -154,6 +236,22 @@ namespace Services.Implementations
             {
                 return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi cập nhật đơn hàng: " + ex.Message));
             }
+        }
+
+
+
+        private async Task<Staff?> FindAvailableStaffAsync(Guid serviceId, DateTime start, DateTime end)
+        {
+            var staffs = await _staffCheduleRepository.GetAvailableStaffs(start, end);
+
+            foreach (var staff in staffs)
+            {
+                var conflict = await _orderDetailRepo.HasConflict(staff.Id, start, end);
+                if (!conflict)
+                    return staff;
+            }
+
+            return null;
         }
     }
 }

@@ -17,6 +17,7 @@ namespace BusinessObjects
         public string PhoneNumber { get; set; } = null!;
         public double Salary { get; set; }
         public DateTime HireDate { get; set; }
-
+        public virtual ICollection<StaffSchedule> StaffSchedules { get; set; } 
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; } 
     }
 }

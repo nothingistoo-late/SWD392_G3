@@ -10,8 +10,20 @@ namespace DTOs.OrderDTO.Respond
     public class OrderRespondDTO
     {
         public Guid Id { get; set; }
-        public string CustomerName { get; set; } = null!;
-        public List<ServiceRespondDTO> Services { get; set; } = new();
+        public Guid CustomerId { get; set; }
+        public DateTime OrderDate { get; set; }
+        public decimal TotalPrice { get; set; }
+        public List<OrderDetailRespondDTO> OrderDetails { get; set; } = new();
+    }
+
+    public class OrderDetailRespondDTO
+    {
+        public Guid ServiceId { get; set; }
+        public string ServiceName { get; set; } = default!;
+        public DateTime ScheduledTime { get; set; }
+        public Guid StaffId { get; set; }
+        public string StaffName { get; set; } = default!;
+
     }
 
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(SWD392_G3DBcontext))]
-    partial class SWD392_G3DBcontextModelSnapshot : ModelSnapshot
+    [Migration("20250630091945_update-price")]
+    partial class updateprice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,7 +238,7 @@ namespace Repositories.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderServices");
                 });
 
             modelBuilder.Entity("BusinessObjects.Rating", b =>
@@ -357,7 +360,7 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Price")
+                    b.Property<double?>("Price")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -428,17 +431,14 @@ namespace Repositories.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -449,8 +449,8 @@ namespace Repositories.Migrations
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");

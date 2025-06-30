@@ -12,8 +12,8 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(SWD392_G3DBcontext))]
-    [Migration("20250629055415_addvitualNavigation")]
-    partial class addvitualNavigation
+    [Migration("20250630100036_updateStaffSchedule")]
+    partial class updateStaffSchedule
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,10 @@ namespace Repositories.Migrations
 
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("imgURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
 
@@ -126,6 +130,10 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("imgURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("CustomerId");
 
                     b.ToTable("Membership");
@@ -155,11 +163,17 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -195,10 +209,19 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("ScheduleTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -213,7 +236,53 @@ namespace Repositories.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("OrderServices");
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Rating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("OrderDetailId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderDetailId")
+                        .IsUnique();
+
+                    b.ToTable("Rating");
                 });
 
             modelBuilder.Entity("BusinessObjects.Role", b =>
@@ -291,14 +360,18 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Price")
-                        .HasColumnType("int");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("imgURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -358,14 +431,17 @@ namespace Repositories.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -376,8 +452,8 @@ namespace Repositories.Migrations
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -629,7 +705,7 @@ namespace Repositories.Migrations
             modelBuilder.Entity("BusinessObjects.Order", b =>
                 {
                     b.HasOne("BusinessObjects.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -648,12 +724,31 @@ namespace Repositories.Migrations
                     b.HasOne("BusinessObjects.Service", "Service")
                         .WithMany("OrderDetails")
                         .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.Staff", "Staff")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
 
                     b.Navigation("Service");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Rating", b =>
+                {
+                    b.HasOne("BusinessObjects.OrderDetail", "OrderDetail")
+                        .WithOne("Rating")
+                        .HasForeignKey("BusinessObjects.Rating", "OrderDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderDetail");
                 });
 
             modelBuilder.Entity("BusinessObjects.Staff", b =>
@@ -670,7 +765,7 @@ namespace Repositories.Migrations
             modelBuilder.Entity("BusinessObjects.StaffSchedule", b =>
                 {
                     b.HasOne("BusinessObjects.Staff", "Staff")
-                        .WithMany()
+                        .WithMany("StaffSchedules")
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -733,6 +828,8 @@ namespace Repositories.Migrations
                 {
                     b.Navigation("Membership")
                         .IsRequired();
+
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BusinessObjects.Order", b =>
@@ -740,9 +837,21 @@ namespace Repositories.Migrations
                     b.Navigation("OrderDetails");
                 });
 
+            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
+                {
+                    b.Navigation("Rating");
+                });
+
             modelBuilder.Entity("BusinessObjects.Service", b =>
                 {
                     b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Staff", b =>
+                {
+                    b.Navigation("OrderDetails");
+
+                    b.Navigation("StaffSchedules");
                 });
 
             modelBuilder.Entity("BusinessObjects.User", b =>

@@ -19,8 +19,7 @@
     {
         Pending,
         Processing,
-        Shipped,
-        Delivered,
+        Done,
         Cancelled
     }
 

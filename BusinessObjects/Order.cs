@@ -15,10 +15,11 @@ namespace BusinessObjects
         public Guid Id { get; set; }
         [ForeignKey(nameof(Customer))]
         public Guid CustomerId { get; set; }
-
         public virtual Customer Customer { get; set; }
         public DateTime OrderDate { get; set; }
         public OrderStatus Status { get; set; }
+        public double TotalPrice { get; set; }
+        public string? Notes { get; set; } = null!;
         public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
 

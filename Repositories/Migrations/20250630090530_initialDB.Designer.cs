@@ -12,8 +12,8 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(SWD392_G3DBcontext))]
-    [Migration("20250629034444_initialDTB")]
-    partial class initialDTB
+    [Migration("20250630090530_initialDB")]
+    partial class initialDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,10 @@ namespace Repositories.Migrations
 
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("imgURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
 
@@ -126,6 +130,10 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("imgURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("CustomerId");
 
                     b.ToTable("Membership");
@@ -155,11 +163,17 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -174,13 +188,11 @@ namespace Repositories.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("BusinessObjects.OrderService", b =>
+            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
                 {
-                    b.Property<int>("OrderServiceId")
+                    b.Property<Guid>("OrderDetailId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderServiceId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -197,10 +209,19 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("ScheduleTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -209,11 +230,13 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("OrderServiceId");
+                    b.HasKey("OrderDetailId");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ServiceId");
+
+                    b.HasIndex("StaffId");
 
                     b.ToTable("OrderServices");
                 });
@@ -302,6 +325,10 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("imgURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Services");
@@ -310,7 +337,6 @@ namespace Repositories.Migrations
             modelBuilder.Entity("BusinessObjects.Staff", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -467,9 +493,6 @@ namespace Repositories.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("StaffProfileId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -492,8 +515,6 @@ namespace Repositories.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("StaffProfileId");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -625,17 +646,19 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("BusinessObjects.Membership", b =>
                 {
-                    b.HasOne("BusinessObjects.Customer", null)
+                    b.HasOne("BusinessObjects.Customer", "Customer")
                         .WithOne("Membership")
                         .HasForeignKey("BusinessObjects.Membership", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("BusinessObjects.Order", b =>
                 {
                     b.HasOne("BusinessObjects.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -643,43 +666,53 @@ namespace Repositories.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("BusinessObjects.OrderService", b =>
+            modelBuilder.Entity("BusinessObjects.OrderDetail", b =>
                 {
                     b.HasOne("BusinessObjects.Order", "Order")
-                        .WithMany("OrderServices")
+                        .WithMany("OrderDetails")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObjects.Service", "Service")
-                        .WithMany("OrderServices")
+                        .WithMany("OrderDetails")
                         .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.Staff", "Staff")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
 
                     b.Navigation("Service");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Staff", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "User")
+                        .WithOne("StaffProfile")
+                        .HasForeignKey("BusinessObjects.Staff", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BusinessObjects.StaffSchedule", b =>
                 {
                     b.HasOne("BusinessObjects.Staff", "Staff")
-                        .WithMany()
+                        .WithMany("StaffSchedules")
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Staff");
-                });
-
-            modelBuilder.Entity("BusinessObjects.User", b =>
-                {
-                    b.HasOne("BusinessObjects.Staff", "StaffProfile")
-                        .WithMany()
-                        .HasForeignKey("StaffProfileId");
-
-                    b.Navigation("StaffProfile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -737,21 +770,32 @@ namespace Repositories.Migrations
                 {
                     b.Navigation("Membership")
                         .IsRequired();
+
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BusinessObjects.Order", b =>
                 {
-                    b.Navigation("OrderServices");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("BusinessObjects.Service", b =>
                 {
-                    b.Navigation("OrderServices");
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Staff", b =>
+                {
+                    b.Navigation("OrderDetails");
+
+                    b.Navigation("StaffSchedules");
                 });
 
             modelBuilder.Entity("BusinessObjects.User", b =>
                 {
                     b.Navigation("Customer");
+
+                    b.Navigation("StaffProfile");
                 });
 #pragma warning restore 612, 618
         }

@@ -34,6 +34,17 @@ namespace Repositories.Implements
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<Order?> GetFullOrderByIdAsync(Guid orderId)
+        {
+            return await _dbSet
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Service)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Staff)
+                        .ThenInclude(staff => staff.User)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
 
     }
 }

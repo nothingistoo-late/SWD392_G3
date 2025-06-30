@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.OrderDTO.Request
 {
-    public class UpdateOrderRequest
+    public class UpdateOrderRequestDTO
     {
         public Guid OrderId { get; set; }
         public DateTime? OrderDate { get; set; } = DateTime.UtcNow;

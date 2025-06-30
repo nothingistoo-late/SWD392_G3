@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
         /// Tạo đơn hàng mới
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateOrderRequestDTO request)
         {
             var result = await _orderService.CreateOrderAsync(request);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
@@ -48,7 +48,7 @@ namespace WebAPI.Controllers
         /// Cập nhật đơn hàng theo ID
         /// </summary>
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateOrderRequest request)
+        public async Task<IActionResult> Update([FromBody] UpdateOrderRequestDTO request)
         {
             var result = await _orderService.UpdateOrderById(request);
             return result.IsSuccess ? Ok(result) : BadRequest(result);

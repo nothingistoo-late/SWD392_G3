@@ -16,18 +16,30 @@ namespace Services.Helpers.Mappers
     {
         public MappingProfile()
         {
-            CreateMap<Service , AddServiceRequestDTO>().ReverseMap();
+            // Service mappings
+            CreateMap<Service, AddServiceRequestDTO>().ReverseMap();
             CreateMap<Service, ServiceRespondDTO>().ReverseMap();
-            CreateMap<Order, OrderRespondDTO>()
-                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.User.FullName))
-                .ForMember(dest => dest.Services, opt => opt.MapFrom(src => src.OrderDetails.Select(od => od.Service)))
-                .ReverseMap();
+
+            // OrderDetail -> OrderDetailRespondDTO
+            CreateMap<OrderDetail, OrderDetailRespondDTO>()
+                    .ForMember(dest => dest.ServiceName,
+                               opt => opt.MapFrom(src => src.Service.Name))
+                    .ForMember(dest => dest.StaffName,
+                               opt => opt.MapFrom(src => src.Staff.User.FirstName + " " + src.Staff.User.LastName))
+                    .ForMember(dest => dest.ScheduledTime,
+                       opt => opt.MapFrom(src => src.ScheduleTime)); // 💥 FIX CHÍNH!
+
+            // 💥 ADD THIS: Order -> OrderRespondDTO
+            CreateMap<Order, OrderRespondDTO>();
+
+            // Customer -> CustomerRespondDTO
             CreateMap<Customer, CustomerRespondDTO>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender.ToString())).ReverseMap();
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender.ToString()))
+                .ReverseMap();
         }
     }
 }

@@ -10,5 +10,6 @@ namespace Repositories.Interfaces
     {
         Task<List<Order>> GetAllWithCustomerAndServiceAsync();
         Task<Order?> GetByIdWithDetailsAsync(Guid id);
+        Task<Order?> GetFullOrderByIdAsync(Guid orderId);
     }
 }
