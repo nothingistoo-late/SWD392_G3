@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repositories
@@ -415,6 +416,36 @@ namespace Repositories
                     await CreateUserAsync(userManager, customer, "string", "USER");
             }
             #endregion
+
+            #region
+            if (!context.Managers.Any())
+            {
+                // Seed Manager
+                var manager = new User
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = "Manager",
+                    LastName = "Tổng manager",
+                    Email = "manager@example.com",
+                    UserName = "Manager",
+                    PhoneNumber = "0961111111",
+                    Gender = "Nam",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await CreateUserAsync(userManager, manager, "string", "MANAGER");
+                var managerr = new Manager
+                {
+                    UserId = manager.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = Guid.Empty
+                }; 
+                await context.Managers.AddAsync(managerr);
+                await context.SaveChangesAsync();
+
+
+            }
+            #endregion Seed Managers
             #region Seed Customers
             if (!context.Customers.Any())
             {
