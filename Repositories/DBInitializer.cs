@@ -92,9 +92,10 @@ namespace Repositories
                     }
                 };
 
-                await context.Users.AddRangeAsync(users);
-                await context.SaveChangesAsync(); // ✅ Lưu Users trước
-
+                //await context.Users.AddRangeAsync(users);
+                //await context.SaveChangesAsync(); // ✅ Lưu Users trước
+                foreach (var staff in users)
+                    await CreateUserAsync(userManager, staff, "string", "Staff");
                 // 2. Seed Staff dựa theo User
                 var staffs = new List<Staff>();
                 foreach (var user in users)
@@ -103,7 +104,6 @@ namespace Repositories
                     {
                         Id = user.Id,
                         User = user,
-                        PhoneNumber = "09" + new Random().Next(10000000, 99999999),
                         Salary = new Random().Next(800, 1200),
                         HireDate = DateTime.UtcNow,
                         CreatedAt = DateTime.UtcNow,
@@ -412,10 +412,7 @@ namespace Repositories
                 };
 
                 foreach (var customer in customers)
-                {
-                    // Bạn có thể tùy chọn gán role mặc định cho khách hàng nếu cần, ví dụ: "USER"
                     await CreateUserAsync(userManager, customer, "string", "USER");
-                }
             }
             #endregion
             #region Seed Customers
@@ -485,8 +482,8 @@ namespace Repositories
                     }
                 };
 
-                await context.Users.AddRangeAsync(customerUsers);
-                await context.SaveChangesAsync(); // ✅ Lưu Users trước
+                foreach(var cus in customerUsers)
+                await CreateUserAsync(userManager, cus, "string", "User");
 
                 // Seed Customer
                 var customers = customerUsers.Select(u => new Customer
