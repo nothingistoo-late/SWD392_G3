@@ -39,13 +39,13 @@ namespace WebAPI.Controllers
                 return BadRequest(new { success = false, message = result.Message });
         }
 
-        [HttpPost("resend-confirmation")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ResendConfirmation([FromBody] ResendEmailRequestDTO dto)
-        {
-            var result = await _userService.ResendConfirmationEmailAsync(dto.Email);
-            return Ok(result.Message);
-        }
+        //[HttpPost("resend-confirmation")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> ResendConfirmation([FromBody] ResendEmailRequestDTO dto)
+        //{
+        //    var result = await _userService.ResendConfirmationEmailAsync(dto.Email);
+        //    return Ok(result.Message);
+        //}
 
         [HttpPost("login")]
         [AllowAnonymous]
@@ -55,15 +55,15 @@ namespace WebAPI.Controllers
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("forgot-password")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO req)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest("Dữ liệu không hợp lệ.");
-            var result = await _userService.InitiatePasswordResetAsync(req);
-            return Ok(result.Message);
-        }
+        //[HttpPost("forgot-password")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO req)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest("Dữ liệu không hợp lệ.");
+        //    var result = await _userService.InitiatePasswordResetAsync(req);
+        //    return Ok(result.Message);
+        //}
 
         [HttpPost("reset-password")]
         [AllowAnonymous]

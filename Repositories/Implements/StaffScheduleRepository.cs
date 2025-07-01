@@ -35,5 +35,21 @@ namespace Repositories.Implements
 
             return schedules;
         }
+
+        public async Task<bool> IsWithinWorkingHours(Guid staffId, DateTime start, DateTime end)
+        {
+            var dayOfWeek = start.DayOfWeek;
+            var startTime = start.TimeOfDay;
+            var endTime = end.TimeOfDay;
+
+            var schedules = await _context.StaffSchedules
+                .Where(s => s.StaffId == staffId && s.DayOfWeek == dayOfWeek)
+                .ToListAsync();
+
+            return schedules.Any(s =>
+                startTime >= s.StartTime && endTime <= s.EndTime
+            );
+        }
+
     }
 }

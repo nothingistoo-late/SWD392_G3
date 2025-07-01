@@ -102,6 +102,7 @@ namespace WebAPI.Extensions
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IStaffScheduleRepository, StaffScheduleRepository>();
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+            services.AddScoped<IStaffRepository, StaffRepository>();
 
 
             services.AddScoped<ICurrentUserService, CurrentUserService>();

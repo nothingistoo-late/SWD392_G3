@@ -17,8 +17,6 @@ namespace Services.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UserService> _logger;
         private readonly IUserEmailService _userEmailService;
-        private readonly string _confirmEmailUri;
-        private readonly string _resetPasswordUri;
         private readonly IUserRepository _userRepository;
 
         public UserService(
@@ -37,13 +35,11 @@ namespace Services.Implementations
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userEmailService = userEmailService ?? throw new ArgumentNullException(nameof(userEmailService));
-            _confirmEmailUri = configuration["Frontend:ConfirmEmailUri"] ?? throw new ArgumentNullException(nameof(configuration), "ConfirmEmailUri is missing");
-            _resetPasswordUri = configuration["Frontend:ResetPasswordUri"] ?? throw new ArgumentNullException(nameof(configuration), "ResetPasswordUri is missing");
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         //public async Task<ApiResult<UserResponse>> RegisterAsync(UserRegisterRequest req)
-        //{
+        //{missing (Parameter 
         //    if (req == null || string.IsNullOrWhiteSpace(req.Email))
         //        return ApiResult<UserResponse>.Failure(new ArgumentException("Invalid request"));
 
@@ -75,19 +71,19 @@ namespace Services.Implementations
         //    return result;
         //}
 
-        public async Task SendWelcomeEmailsAsync(string email)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return;
+        //public async Task SendWelcomeEmailsAsync(string email)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(email);
+        //    if (user == null) return;
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        //    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            // Không cần encode token ở đây, để UserEmailService xử lý
-            await Task.WhenAll(
-                _userEmailService.SendWelcomeEmailAsync(email),
-                _userEmailService.SendEmailConfirmationAsync(email, user.Id, token, _confirmEmailUri)
-            );
-        }
+        //    // Không cần encode token ở đây, để UserEmailService xử lý
+        //    await Task.WhenAll(
+        //        _userEmailService.SendWelcomeEmailAsync(email),
+        //        _userEmailService.SendEmailConfirmationAsync(email, user.Id, token, _confirmEmailUri)
+        //    );
+        //}
 
         public async Task<ApiResult<string>> ConfirmEmailAsync(Guid userId, string encodedToken)
         {
@@ -120,43 +116,43 @@ namespace Services.Implementations
             return ApiResult<string>.Success("Email confirmed successfully", "Email confirmed successfully");
         }
 
-        public async Task<ApiResult<string>> ResendConfirmationEmailAsync(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return ApiResult<string>.Failure(new ArgumentException("Invalid email"));
+        //public async Task<ApiResult<string>> ResendConfirmationEmailAsync(string email)
+        //{
+        //    if (string.IsNullOrWhiteSpace(email))
+        //        return ApiResult<string>.Failure(new ArgumentException("Invalid email"));
 
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return ApiResult<string>.Success("If the email is valid and unconfirmed, a confirmation email will be sent", "Confirmation email process completed");
+        //    var user = await _userManager.FindByEmailAsync(email);
+        //    if (user == null)
+        //        return ApiResult<string>.Success("If the email is valid and unconfirmed, a confirmation email will be sent", "Confirmation email process completed");
 
-            if (await _userManager.IsEmailConfirmedAsync(user))
-                return ApiResult<string>.Success("Email is already confirmed", "Email confirmation status checked");
+        //    if (await _userManager.IsEmailConfirmedAsync(user))
+        //        return ApiResult<string>.Success("Email is already confirmed", "Email confirmation status checked");
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        //    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            // Truyền token nguyên bản, để UserEmailService xử lý việc encode
-            await _userEmailService.SendEmailConfirmationAsync(email, user.Id, token, _confirmEmailUri);
-            return ApiResult<string>.Success("Confirmation email resent", "Confirmation email sent successfully");
-        }
+        //    // Truyền token nguyên bản, để UserEmailService xử lý việc encode
+        //    await _userEmailService.SendEmailConfirmationAsync(email, user.Id, token, _confirmEmailUri);
+        //    return ApiResult<string>.Success("Confirmation email resent", "Confirmation email sent successfully");
+        //}
 
-        public async Task<ApiResult<string>> InitiatePasswordResetAsync(ForgotPasswordRequestDTO request)
-        {
-            if (request == null || string.IsNullOrWhiteSpace(request.Email))
-                return ApiResult<string>.Failure(new ArgumentException("Invalid email"));
+        //public async Task<ApiResult<string>> InitiatePasswordResetAsync(ForgotPasswordRequestDTO request)
+        //{
+        //    if (request == null || string.IsNullOrWhiteSpace(request.Email))
+        //        return ApiResult<string>.Failure(new ArgumentException("Invalid email"));
 
-            var genericResponse = ApiResult<string>.Success("If the email is valid, you'll receive password reset instructions", "Password reset process initiated");
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
-                return genericResponse;
+        //    var genericResponse = ApiResult<string>.Success("If the email is valid, you'll receive password reset instructions", "Password reset process initiated");
+        //    var user = await _userManager.FindByEmailAsync(request.Email);
+        //    if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
+        //        return genericResponse;
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            _logger.LogDebug("Raw token: {Token}", token);
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            _logger.LogDebug("Encoded token: {encodedToken}", encodedToken);
+        //    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        //    _logger.LogDebug("Raw token: {Token}", token);
+        //    var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        //    _logger.LogDebug("Encoded token: {encodedToken}", encodedToken);
 
-            await _userEmailService.SendPasswordResetEmailAsync(request.Email, encodedToken, _resetPasswordUri);
-            return genericResponse;
-        }
+        //    await _userEmailService.SendPasswordResetEmailAsync(request.Email, encodedToken, _resetPasswordUri);
+        //    return genericResponse;
+        //}
 
         public async Task<ApiResult<string>> ResetPasswordAsync(ResetPasswordRequestDTO request)
         {
@@ -244,8 +240,8 @@ namespace Services.Implementations
                 return ApiResult<UserResponse>.Failure(new UnauthorizedAccessException("Invalid email or password"));
             }
 
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-                return ApiResult<UserResponse>.Failure(new InvalidOperationException("Please confirm your email before logging in"));
+            //if (!await _userManager.IsEmailConfirmedAsync(user))
+            //    return ApiResult<UserResponse>.Failure(new InvalidOperationException("Please confirm your email before logging in"));
 
             if (await _userManager.IsLockedOutAsync(user))
                 return ApiResult<UserResponse>.Failure(new InvalidOperationException("Account is locked"));

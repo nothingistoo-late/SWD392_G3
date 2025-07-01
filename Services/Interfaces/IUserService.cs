@@ -19,11 +19,10 @@
         Task<ApiResult<UserResponse>> UnlockUserAsync(Guid id);
         Task<ApiResult<UserResponse>> LockUserAsync(Guid id);
         Task<ApiResult<string>> ConfirmEmailAsync(Guid userId, string token);
-        Task<ApiResult<string>> ResendConfirmationEmailAsync(string email);
-        Task<ApiResult<string>> InitiatePasswordResetAsync(ForgotPasswordRequestDTO request);
+        //Task<ApiResult<string>> ResendConfirmationEmailAsync(string email);
         Task<ApiResult<string>> ResetPasswordAsync(ResetPasswordRequestDTO request);
         Task<ApiResult<string>> Send2FACodeAsync();
-        Task SendWelcomeEmailsAsync(string email);
+        //Task SendWelcomeEmailsAsync(string email);
 
 
     }

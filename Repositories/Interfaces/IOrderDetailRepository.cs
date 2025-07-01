@@ -9,6 +9,6 @@ namespace Repositories.Interfaces
     public interface IOrderDetailRepository : IGenericRepository<OrderDetail, Guid>
     {
         Task<bool> HasConflict(Guid staffId, DateTime start, DateTime end);
-
+        Task<bool> IsStaffBusy(Guid staffId, DateTime start, DateTime end);
     }
 }

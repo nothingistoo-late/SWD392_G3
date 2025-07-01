@@ -13,7 +13,7 @@ namespace Services.Interfaces
         Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequestDTO dto);
         Task<ApiResult<OrderRespondDTO>> GetOrderByIdAsync(Guid Id);
         Task<ApiResult<List<OrderRespondDTO>>> GetAllOrdersAsync();
-        Task<ApiResult<OrderRespondDTO>> UpdateOrderById(UpdateOrderRequestDTO request);
+        Task<ApiResult<OrderRespondDTO>> UpdateOrderAsync(UpdateOrderRequestDTO dto);
         Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId);
     }
 }

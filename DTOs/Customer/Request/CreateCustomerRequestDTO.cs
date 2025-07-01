@@ -27,7 +27,7 @@ namespace DTOs
         public string LastName { get; set; }
         [Required(ErrorMessage = "giới tính là bắt buộc")]
         [MaxLength(100)]
-        public GenderEnums? Gender { get; set; }
+        public GenderEnums Gender { get; set; }
         [Required(ErrorMessage = "Địa chỉ là bắt buộc")]
         public string Address { get; set; } = string.Empty; 
 

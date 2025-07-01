@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateOrderRequestDTO request)
         {
-            var result = await _orderService.UpdateOrderById(request);
+            var result = await _orderService.UpdateOrderAsync(request);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 

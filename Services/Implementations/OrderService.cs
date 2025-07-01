@@ -34,27 +34,33 @@ namespace Services.Implementations
             await _unitOfWork.BeginTransactionAsync();
             try
             {
+                // ✅ 1. Kiểm tra customer
                 var customer = await _unitOfWork.UserRepository.GetUserDetailsByIdAsync(dto.CustomerId);
                 if (customer == null || customer.IsDeleted)
                     return ApiResult<OrderRespondDTO>.Failure(new Exception($"Khách hàng với ID {dto.CustomerId} không tồn tại."));
 
                 if (dto.OrderDate < _currentTime.GetVietnamTime())
-                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt hàng không được trong quá khứ."));
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt hàng "+dto.OrderDate+" không được trong quá khứ."));
 
+                // ✅ 2. Khởi tạo order
                 var order = new Order
                 {
                     Id = Guid.NewGuid(),
                     CustomerId = dto.CustomerId,
-                    OrderDate = DateTime.Now,
+                    OrderDate = _currentTime.GetVietnamTime(),
                     Status = OrderStatus.Pending,
                     OrderDetails = new List<OrderDetail>()
                 };
 
                 double total = 0;
+                var staffScheduleTracker = new Dictionary<Guid, List<(DateTime start, DateTime end)>>();
 
+                // ✅ 3. Duyệt từng dịch vụ
                 foreach (var item in dto.Services)
                 {
-                    // 1. Get service info
+                    if (item.ScheduledTime < _currentTime.GetVietnamTime())
+                        return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt dịch vụ có id "+item.ServiceId+" không được trong quá khứ."));
+
                     var service = await _serviceRepository.GetByIdAsync(item.ServiceId);
                     if (service == null || service.IsDeleted)
                         return ApiResult<OrderRespondDTO>.Failure(new Exception($"Dịch vụ với ID {item.ServiceId} không tồn tại."));
@@ -62,32 +68,60 @@ namespace Services.Implementations
                     var start = item.ScheduledTime;
                     var end = start.AddMinutes(service.Duration);
 
-                    // 2. Find available staff
-                    var staff = await FindAvailableStaffAsync(service.Id, start, end);
-                    if (staff == null)
-                        return ApiResult<OrderRespondDTO>.Failure(new Exception($"Không tìm thấy nhân viên rảnh cho dịch vụ lúc {start:HH:mm dd/MM}"));
+                    // ✅ 4. Check thời gian có hợp lệ không (giờ làm việc: 08:00–18:00)
+                    if (start.Hour < 8 || end.Hour >= 18 || (end.Hour == 17 && end.Minute > 59))
+                    {
+                        return ApiResult<OrderRespondDTO>.Failure(
+                            new Exception($"Giờ đặt {start:HH:mm} – {end:HH:mm} không nằm trong khung giờ làm việc (08:00 – 18:00)."));
+                    }
 
-                    // 3. Create OrderDetail (✅ nhớ gán ScheduleTime)
+                    // ✅ 5. Tìm staff rảnh có ca làm
+                    var allStaff = await _unitOfWork.StaffRepository.GetAllAsync();
+                    Staff? selectedStaff = null;
+
+                    foreach (var staff in allStaff.Where(s => !s.IsDeleted))
+                    {
+                        var isBusy = await _unitOfWork.OrderDetailRepository.IsStaffBusy(staff.Id, start, end);
+                        var tempBusy = staffScheduleTracker.TryGetValue(staff.Id, out var slots)
+                                       && slots.Any(slot => slot.start < end && slot.end > start);
+                        var isWorking = await _unitOfWork.StaffScheduleRepository
+                            .IsWithinWorkingHours(staff.Id, start, end); // ✅ Hàm check ca làm thực tế
+
+                        if (!isBusy && !tempBusy && isWorking)
+                        {
+                            selectedStaff = staff;
+
+                            if (!staffScheduleTracker.ContainsKey(staff.Id))
+                                staffScheduleTracker[staff.Id] = new List<(DateTime, DateTime)>();
+                            staffScheduleTracker[staff.Id].Add((start, end));
+                            break;
+                        }
+                    }
+
+                    if (selectedStaff == null)
+                        return ApiResult<OrderRespondDTO>.Failure(
+                            new Exception($"Không có nhân viên nào rảnh và đang làm việc lúc {start:HH:mm dd/MM}."));
+
+                    // ✅ 6. Add OrderDetail
                     order.OrderDetails.Add(new OrderDetail
                     {
                         OrderDetailId = Guid.NewGuid(),
+                        OrderId = order.Id,
                         ServiceId = service.Id,
-                        ScheduleTime = start,
-                        StaffId = staff.Id,
-                        OrderId = order.Id
+                        StaffId = selectedStaff.Id,
+                        ScheduleTime = start
                     });
 
                     total += service.Price;
                 }
 
+                // ✅ 7. Lưu & commit
                 order.TotalPrice = total;
-
                 await CreateAsync(order);
                 await _unitOfWork.CommitTransactionAsync();
 
-                // ✅ Reload lại Order kèm navigation
+                // ✅ 8. Load lại đầy đủ để trả về
                 var fullOrder = await _unitOfWork.OrderRepository.GetFullOrderByIdAsync(order.Id);
-
                 if (fullOrder == null)
                     return ApiResult<OrderRespondDTO>.Failure(new Exception("Không thể load lại đơn hàng sau khi tạo."));
 
@@ -100,6 +134,7 @@ namespace Services.Implementations
                 return ApiResult<OrderRespondDTO>.Failure(new Exception("Đã có lỗi xảy ra khi tạo đơn hàng: " + ex.Message));
             }
         }
+
 
 
 
@@ -195,50 +230,125 @@ namespace Services.Implementations
             }
         }
 
-        public async Task<ApiResult<OrderRespondDTO>> UpdateOrderById(UpdateOrderRequestDTO request)
+        public async Task<ApiResult<OrderRespondDTO>> UpdateOrderAsync(UpdateOrderRequestDTO dto)
         {
+            await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var order = await _repository.GetByIdAsync(request.OrderId, o => o.OrderDetails);
+                var order = await _unitOfWork.OrderRepository.GetFullOrderByIdAsync(dto.OrderId);
+                if (order == null || order.IsDeleted)
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Đơn hàng không tồn tại!"));
 
-                if (order == null)
-                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Không tìm thấy đơn hàng!"));
+                if (order.Status != OrderStatus.Pending)
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Chỉ có thể cập nhật đơn hàng đang chờ xử lý."));
 
-                // ✅ Chỉ update field nếu có giá trị
-                if (request.OrderDate.HasValue)
-                    order.OrderDate = request.OrderDate.Value;
-
-                // ✅ Nếu có ServiceIds mới → cập nhật lại OrderDetails
-                if (request.ServiceIds is { Count: > 0 })
+                // ✅ Cập nhật customer nếu có
+                if (dto.CustomerId.HasValue && dto.CustomerId != order.CustomerId)
                 {
-                    order.OrderDetails.Clear();
-                    foreach (var sid in request.ServiceIds)
+                    var customer = await _unitOfWork.UserRepository.GetUserDetailsByIdAsync(dto.CustomerId.Value);
+                    if (customer == null || customer.IsDeleted)
+                        return ApiResult<OrderRespondDTO>.Failure(new Exception("Khách hàng không tồn tại."));
+
+                    order.CustomerId = dto.CustomerId.Value;
+                }
+
+                var staffScheduleTracker = new Dictionary<Guid, List<(DateTime start, DateTime end)>>();
+
+                // ✅ Duyệt các OrderDetail cũ để tính lại tổng tiền và build tracker
+                double total = 0;
+                foreach (var od in order.OrderDetails)
+                {
+                    var service = await _serviceRepository.GetByIdAsync(od.ServiceId);
+                    if (service != null && !service.IsDeleted)
                     {
-                        order.OrderDetails.Add(new OrderDetail
-                        {
-                            ServiceId = sid,
-                            CreatedAt = _currentTime.GetVietnamTime(),
-                            CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty
-                        });
+                        total += service.Price;
+
+                        if (!staffScheduleTracker.ContainsKey(od.StaffId))
+                            staffScheduleTracker[od.StaffId] = new();
+                        staffScheduleTracker[od.StaffId].Add((od.ScheduleTime, od.ScheduleTime.AddMinutes(service.Duration)));
                     }
                 }
 
-                order.UpdatedAt = _currentTime.GetVietnamTime();
-                order.UpdatedBy = _currentUserService.GetUserId() ?? Guid.Empty;
+                // ✅ Patch dịch vụ nếu được gửi lên
+                if (dto.Services != null && dto.Services.Any())
+                {
+                    var existingDetailKeys = order.OrderDetails
+                        .Select(x => $"{x.ServiceId}_{x.ScheduleTime:O}")
+                        .ToHashSet();
 
-                await _repository.UpdateAsync(order);
-                await _unitOfWork.SaveChangesAsync();
+                    foreach (var item in dto.Services)
+                    {
+                        var key = $"{item.ServiceId}_{item.ScheduledTime:O}";
+                        if (existingDetailKeys.Contains(key)) continue; // đã có rồi → skip
 
-                var dto = _mapper.Map<OrderRespondDTO>(order);
-                return ApiResult<OrderRespondDTO>.Success(dto, "Cập nhật đơn hàng thành công!");
+                        var service = await _serviceRepository.GetByIdAsync(item.ServiceId);
+                        if (service == null || service.IsDeleted)
+                            return ApiResult<OrderRespondDTO>.Failure(new Exception($"Dịch vụ {item.ServiceId} không tồn tại."));
+
+                        var start = item.ScheduledTime;
+                        var end = start.AddMinutes(service.Duration);
+
+                        if (start.Hour < 8 || end.Hour >= 18)
+                            return ApiResult<OrderRespondDTO>.Failure(new Exception($"Giờ {start:HH:mm} – {end:HH:mm} không hợp lệ."));
+
+                        var allStaff = await _unitOfWork.StaffRepository.GetAllAsync();
+                        Staff? selectedStaff = null;
+
+                        foreach (var staff in allStaff.Where(s => !s.IsDeleted))
+                        {
+                            var isBusy = await _unitOfWork.OrderDetailRepository.IsStaffBusy(staff.Id, start, end);
+                            var tempBusy = staffScheduleTracker.TryGetValue(staff.Id, out var slots)
+                                           && slots.Any(slot => slot.start < end && slot.end > start);
+                            var isWorking = await _unitOfWork.StaffScheduleRepository
+                                .IsWithinWorkingHours(staff.Id, start, end);
+
+                            if (!isBusy && !tempBusy && isWorking)
+                            {
+                                selectedStaff = staff;
+
+                                if (!staffScheduleTracker.ContainsKey(staff.Id))
+                                    staffScheduleTracker[staff.Id] = new();
+                                staffScheduleTracker[staff.Id].Add((start, end));
+                                break;
+                            }
+                        }
+
+                        if (selectedStaff == null)
+                            return ApiResult<OrderRespondDTO>.Failure(
+                                new Exception($"Không có nhân viên nào rảnh lúc {start:HH:mm dd/MM}."));
+
+                        var detail = new OrderDetail
+                        {
+                            OrderDetailId = Guid.NewGuid(),
+                            OrderId = order.Id,
+                            ServiceId = service.Id,
+                            StaffId = selectedStaff.Id,
+                            ScheduleTime = start
+                        };
+
+                        await _unitOfWork.OrderDetailRepository.AddAsync(detail);
+                        order.OrderDetails.Add(detail);
+                        total += service.Price;
+                    }
+
+                    // ✅ Update lại total price nếu có thêm dịch vụ
+                    order.TotalPrice = total;
+                }
+
+                await _unitOfWork.OrderRepository.UpdateAsync(order);
+                await _unitOfWork.CommitTransactionAsync();
+
+                var fullOrder = await _unitOfWork.OrderRepository.GetFullOrderByIdAsync(order.Id);
+                var response = _mapper.Map<OrderRespondDTO>(fullOrder);
+
+                return ApiResult<OrderRespondDTO>.Success(response, "Cập nhật đơn hàng thành công!");
             }
             catch (Exception ex)
             {
-                return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi cập nhật đơn hàng: " + ex.Message));
+                await _unitOfWork.RollbackTransactionAsync();
+                return ApiResult<OrderRespondDTO>.Failure(new Exception("Có lỗi khi cập nhật đơn hàng: " + ex.Message));
             }
         }
-
-
 
         private async Task<Staff?> FindAvailableStaffAsync(Guid serviceId, DateTime start, DateTime end)
         {

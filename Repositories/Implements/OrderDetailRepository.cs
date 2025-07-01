@@ -23,5 +23,13 @@ namespace Repositories.Implements
                             start < od.ScheduleTime.AddMinutes(od.Service.Duration) &&
                             end > od.ScheduleTime);
         }
+        public async Task<bool> IsStaffBusy(Guid staffId, DateTime start, DateTime end)
+        {
+            return await _dbSet.AnyAsync(od =>
+                od.StaffId == staffId &&
+                od.ScheduleTime < end &&      // Có lịch bắt đầu trước khi kết thúc lịch mới
+                end > od.ScheduleTime         // Và kết thúc sau khi lịch cũ bắt đầu
+            );
+        }
     }
 }

@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DTOs.OrderDTO.Request
+public class UpdateOrderRequestDTO
 {
-    public class UpdateOrderRequestDTO
-    {
-        public Guid OrderId { get; set; }
-        public DateTime? OrderDate { get; set; } = DateTime.UtcNow;
-        public List<Guid>? ServiceIds { get; set; } = new();
-    }
+    [Required(ErrorMessage = "Cần phải nhập Order Id ")]
+
+    public Guid OrderId { get; set; }
+    public Guid? CustomerId { get; set; }
+    public List<OrderServiceUpdateItemDTO>? Services { get; set; } = new();
+}
+
+public class OrderServiceUpdateItemDTO
+{
+    public Guid ServiceId { get; set; }
+    public DateTime ScheduledTime { get; set; }
 }

@@ -19,7 +19,5 @@ namespace BusinessObjects
         public Membership Membership { get; set; }
         public virtual ICollection<Order>? Orders { get; set; } 
 
-
-
     }
 }

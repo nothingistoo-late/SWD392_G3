@@ -6,7 +6,6 @@
         MALE,
         FEMALE
     }
-
     public enum MemberShipType
     {
         Bronze,
