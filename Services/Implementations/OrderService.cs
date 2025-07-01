@@ -134,44 +134,6 @@ namespace Services.Implementations
                 return ApiResult<OrderRespondDTO>.Failure(new Exception("Đã có lỗi xảy ra khi tạo đơn hàng: " + ex.Message));
             }
         }
-
-
-
-
-        //public async Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequest request)
-        //{
-        //    try
-        //    {
-        //        var order = new Order
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            CustomerId = request.CustomerId,
-        //            OrderDate = request.OrderDate,
-        //            CreatedAt = _currentTime.GetVietnamTime(),
-        //            CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty,
-        //            OrderDetails = request.ServiceIds.Select(sid => new OrderDetail
-        //            {
-        //                ServiceId = sid,
-        //                CreatedAt = _currentTime.GetVietnamTime(),
-        //                CreatedBy = _currentUserService.GetUserId() ?? Guid.Empty
-        //            }).ToList()
-        //        };
-
-        //        await _repository.AddAsync(order);
-        //        await _unitOfWork.SaveChangesAsync();
-
-        //        var dto = _mapper.Map<OrderRespondDTO>(order);
-        //        return ApiResult<OrderRespondDTO>.Success(dto, "Tạo đơn hàng thành công!");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi tạo đơn hàng: " + ex.Message));
-        //    }
-        //}
-
-
-
-
         public async Task<ApiResult<List<OrderRespondDTO>>> GetAllOrdersAsync()
         {
             try
@@ -205,30 +167,54 @@ namespace Services.Implementations
         }
 
 
+        //public async Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId)
+        //{
+        //    try
+        //    {
+        //        var order = await _repository.GetByIdAsync(orderId);
+
+        //        if (order == null)
+        //            return ApiResult<OrderRespondDTO>.Failure(new Exception("Không tìm thấy đơn hàng để xóa!"));
+
+        //        order.IsDeleted = true;
+        //        order.DeletedAt = _currentTime.GetVietnamTime();
+        //        order.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
+
+        //        await UpdateAsync(order);
+        //        await _unitOfWork.SaveChangesAsync();
+
+        //        var result = _mapper.Map<OrderRespondDTO>(order);
+        //        return ApiResult<OrderRespondDTO>.Success(result, "Xóa mềm đơn hàng thành công!");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm đơn hàng: " + e.Message));
+        //    }
+        //}
+
         public async Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId)
         {
             try
             {
                 var order = await _repository.GetByIdAsync(orderId);
-
-                if (order == null)
+                if (order == null || order.IsDeleted)
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Đơn hàng không tồn tại hoặc đã bị xóa!"));
+                var deleted = await _repository.SoftDeleteAsync(orderId, _currentUserService.GetUserId());
+                if (!deleted)
                     return ApiResult<OrderRespondDTO>.Failure(new Exception("Không tìm thấy đơn hàng để xóa!"));
 
-                order.IsDeleted = true;
-                order.DeletedAt = _currentTime.GetVietnamTime();
-                order.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
-
-                await UpdateAsync(order);
                 await _unitOfWork.SaveChangesAsync();
 
-                var result = _mapper.Map<OrderRespondDTO>(order);
-                return ApiResult<OrderRespondDTO>.Success(result, "Xóa mềm đơn hàng thành công!");
+                var dto = _mapper.Map<OrderRespondDTO>(order);
+                return ApiResult<OrderRespondDTO>.Success(dto, "Xóa mềm đơn hàng thành công!");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm đơn hàng: " + e.Message));
+                return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm đơn hàng: " + ex.Message));
             }
         }
+
+
 
         public async Task<ApiResult<OrderRespondDTO>> UpdateOrderAsync(UpdateOrderRequestDTO dto)
         {

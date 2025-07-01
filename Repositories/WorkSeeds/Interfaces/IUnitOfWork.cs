@@ -9,6 +9,7 @@ namespace Repositories.WorkSeeds.Interfaces
         IUserRepository UserRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
         IOrderRepository OrderRepository { get; }
+        IServiceRepository ServiceRepository { get; }
         IStaffRepository StaffRepository { get; }
         IStaffScheduleRepository StaffScheduleRepository { get; }
     }

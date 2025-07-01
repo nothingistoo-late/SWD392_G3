@@ -76,31 +76,57 @@ namespace Services.Implementations
             }
         }
 
+        //public async Task<ApiResult<ServiceRespondDTO>> SoftDeleteServiceById(Guid serviceId)
+        //{
+        //    try
+        //    {
+        //        var service = await _repository.GetByIdAsync(serviceId);
+        //        if (service == null)
+        //        {
+        //            return ApiResult<ServiceRespondDTO>.Failure(new Exception("Không tìm thấy dịch vụ với Id: " + serviceId));
+        //        }
+        //        if (service.IsDeleted)
+        //        {
+        //            return ApiResult<ServiceRespondDTO>.Failure(new Exception("Dịch vụ này đã bị xóa trước đó."));
+        //        }
+
+        //        service.IsDeleted = true;
+        //        service.DeletedAt = _currentTime.GetVietnamTime();
+        //        service.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
+        //        await UpdateAsync(service);
+        //        return ApiResult<ServiceRespondDTO>.Success(_mapper.Map<ServiceRespondDTO>(service), "Xóa dịch vụ thành công!!");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return ApiResult<ServiceRespondDTO>.Failure(new Exception("Lỗi khi xóa dịch vụ!!" + e.Message));
+        //    }
+        //}
+
         public async Task<ApiResult<ServiceRespondDTO>> SoftDeleteServiceById(Guid serviceId)
         {
             try
             {
-                var service = await _repository.GetByIdAsync(serviceId);
-                if (service == null)
-                {
-                    return ApiResult<ServiceRespondDTO>.Failure(new Exception("Không tìm thấy dịch vụ với Id: " + serviceId));
-                }
-                if (service.IsDeleted)
-                {
-                    return ApiResult<ServiceRespondDTO>.Failure(new Exception("Dịch vụ này đã bị xóa trước đó."));
-                }
 
-                service.IsDeleted = true;
-                service.DeletedAt = _currentTime.GetVietnamTime();
-                service.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
-                await UpdateAsync(service);
-                return ApiResult<ServiceRespondDTO>.Success(_mapper.Map<ServiceRespondDTO>(service), "Xóa dịch vụ thành công!!");
+                var service = await _repository.GetByIdAsync(serviceId);
+
+                var deleted = await _repository.SoftDeleteAsync(serviceId, _currentUserService.GetUserId());
+                if (!deleted)
+                    return ApiResult<ServiceRespondDTO>.Failure(new Exception($"Không tìm thấy dịch vụ với Id: {serviceId}"));
+
+                await _unitOfWork.SaveChangesAsync();
+
+                var dto = _mapper.Map<ServiceRespondDTO>(service);
+                return ApiResult<ServiceRespondDTO>.Success(dto, "Xóa mềm dịch vụ thành công!");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return ApiResult<ServiceRespondDTO>.Failure(new Exception("Lỗi khi xóa dịch vụ!!" + e.Message));
+                return ApiResult<ServiceRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm dịch vụ: " + ex.Message));
             }
         }
+
+
+
+
 
         public async Task<ApiResult<ServiceRespondDTO>> UpdateServiceById(UpdateServiceRequest request)
         {

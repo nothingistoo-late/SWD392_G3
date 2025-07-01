@@ -31,10 +31,10 @@ namespace Repositories
 
 
             modelBuilder.Entity<OrderDetail>()
-       .HasOne(od => od.Staff)
-       .WithMany(s => s.OrderDetails)
-       .HasForeignKey(od => od.StaffId)
-       .OnDelete(DeleteBehavior.Restrict);
+               .HasOne(od => od.Staff)
+               .WithMany(s => s.OrderDetails)
+               .HasForeignKey(od => od.StaffId)
+               .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OrderDetail>()
                 .HasOne(od => od.Service)
@@ -47,6 +47,17 @@ namespace Repositories
                 .WithMany(o => o.OrderDetails)
                 .HasForeignKey(od => od.OrderId)
                 .OnDelete(DeleteBehavior.Cascade); // 👈 Giữ lại cascade 1 thằng thôi
+
+            modelBuilder.Entity<Order>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<OrderDetail>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Service>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<User>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Staff>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Manager>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<StaffSchedule>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Rating>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Membership>().HasQueryFilter(x => !x.IsDeleted);
         }
     }
 }

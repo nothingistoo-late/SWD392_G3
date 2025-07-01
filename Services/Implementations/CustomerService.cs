@@ -2,6 +2,8 @@
 using DTOs;
 using DTOs.Customer.Responds;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Repositories;
 using Repositories.Implements;
 using Repositories.Interfaces;
 using Services.Commons;
@@ -19,10 +21,12 @@ namespace Services.Implementations
 
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
-        public CustomerService(IMapper mapper, UserManager<User> usermanager,IGenericRepository<Customer, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
+        private readonly SWD392_G3DBcontext _context;
+        public CustomerService(SWD392_G3DBcontext context, IMapper mapper, UserManager<User> usermanager,IGenericRepository<Customer, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
         {
             _userManager = usermanager;
             _mapper = mapper;   
+            _context = context;
         }
 
         public async Task<ApiResult<CreateCustomerRequestDTO>> CreateCustomerAsync(CreateCustomerRequestDTO dto)
@@ -103,31 +107,71 @@ namespace Services.Implementations
             }
         }
 
+        //public async Task<ApiResult<CustomerRespondDTO>> SoftDeleteCustomerById(Guid customerId)
+        //{
+        //    try
+        //    {
+        //        var customer = await _repository.GetByIdAsync(customerId, c => c.User);
+
+        //        if (customer == null || customer.IsDeleted)
+        //        {
+        //            return ApiResult<CustomerRespondDTO>.Failure(new Exception("Không tìm thấy khách hàng!"));
+        //        }
+
+        //        customer.IsDeleted = true;
+        //        customer.DeletedAt = _currentTime.GetVietnamTime();
+        //        customer.DeletedBy = _currentUserService.GetUserId();
+
+        //        await _repository.UpdateAsync(customer);
+        //        await _unitOfWork.SaveChangesAsync();
+
+        //        var resultDto = _mapper.Map<CustomerRespondDTO>(customer);
+        //        return ApiResult<CustomerRespondDTO>.Success(resultDto, "Xóa mềm khách hàng thành công!");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ApiResult<CustomerRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm khách hàng! " + ex.Message));
+        //    }
+        //}
+
         public async Task<ApiResult<CustomerRespondDTO>> SoftDeleteCustomerById(Guid customerId)
         {
             try
             {
                 var customer = await _repository.GetByIdAsync(customerId, c => c.User);
-
                 if (customer == null || customer.IsDeleted)
+                    return ApiResult<CustomerRespondDTO>.Failure(new Exception("Không tìm thấy khách hàng để xóa!"));
+
+                var userId = customer.UserId;
+                var currentUserId = _currentUserService.GetUserId();
+
+                // Xóa mềm Customer
+                var deletedCustomer = await _repository.SoftDeleteAsync(customerId, currentUserId);
+
+                // Xóa mềm User (liên kết với customer)
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user != null && !user.IsDeleted)
                 {
-                    return ApiResult<CustomerRespondDTO>.Failure(new Exception("Không tìm thấy khách hàng!"));
+                    user.IsDeleted = true;
+                    user.UpdatedAt = _currentTime.GetVietnamTime();
+                    user.UpdatedBy = currentUserId ?? Guid.Empty;
+
+                    _context.Users.Update(user);
                 }
 
-                customer.IsDeleted = true;
-                customer.DeletedAt = _currentTime.GetVietnamTime();
-                customer.DeletedBy = _currentUserService.GetUserId();
-
-                await _repository.UpdateAsync(customer);
                 await _unitOfWork.SaveChangesAsync();
 
-                var resultDto = _mapper.Map<CustomerRespondDTO>(customer);
-                return ApiResult<CustomerRespondDTO>.Success(resultDto, "Xóa mềm khách hàng thành công!");
+                var dto = _mapper.Map<CustomerRespondDTO>(customer);
+                return ApiResult<CustomerRespondDTO>.Success(dto, "Xóa mềm khách hàng + tài khoản thành công!");
             }
             catch (Exception ex)
             {
-                return ApiResult<CustomerRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm khách hàng! " + ex.Message));
+                return ApiResult<CustomerRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm khách hàng: " + ex.Message));
             }
         }
+
+
+
+
     }
 }

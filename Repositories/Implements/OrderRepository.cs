@@ -16,34 +16,45 @@ namespace Repositories.Implements
         public async Task<List<Order>> GetAllWithCustomerAndServiceAsync()
         {
             return await _context.Orders
+                .Where(o => !o.IsDeleted)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
-                .Include(o => o.OrderDetails)
+                .Include(o => o.OrderDetails.Where(od => !od.IsDeleted))
                     .ThenInclude(od => od.Service)
+                .Where(o => !o.Customer.IsDeleted && !o.Customer.User.IsDeleted)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
         }
+
         // Trong OrderRepository
         public async Task<Order?> GetByIdWithDetailsAsync(Guid id)
         {
             return await _context.Orders
+                .Where(o => !o.IsDeleted && o.Id == id)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
-                .Include(o => o.OrderDetails)
+                .Include(o => o.OrderDetails.Where(od => !od.IsDeleted))
                     .ThenInclude(od => od.Service)
-                .FirstOrDefaultAsync(o => o.Id == id);
+                .FirstOrDefaultAsync(o => !o.Customer.IsDeleted && !o.Customer.User.IsDeleted);
         }
+
 
         public async Task<Order?> GetFullOrderByIdAsync(Guid orderId)
         {
             return await _dbSet
-                .Include(o => o.OrderDetails)
+                .Where(o => !o.IsDeleted && o.Id == orderId)
+                .Include(o => o.OrderDetails.Where(od => !od.IsDeleted))
                     .ThenInclude(od => od.Service)
-                .Include(o => o.OrderDetails)
+                .Include(o => o.OrderDetails.Where(od => !od.IsDeleted))
                     .ThenInclude(od => od.Staff)
                         .ThenInclude(staff => staff.User)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o =>
+                    o.OrderDetails.All(od =>
+                        !od.Service.IsDeleted &&
+                        !od.Staff.IsDeleted &&
+                        !od.Staff.User.IsDeleted));
         }
+
 
 
     }

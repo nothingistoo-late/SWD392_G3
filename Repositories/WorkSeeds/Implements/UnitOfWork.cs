@@ -16,6 +16,7 @@ namespace Repositories.WorkSeeds.Implements
         private IOrderRepository _orderRepository;
         private IStaffRepository _staffRepository;
         private IStaffScheduleRepository _staffScheduleRepository;
+        private IServiceRepository _serviceRepository;
         public UnitOfWork(SWD392_G3DBcontext context, IRepositoryFactory repositoryFactory)
         {
             _context = context;
@@ -34,7 +35,9 @@ namespace Repositories.WorkSeeds.Implements
         public IStaffRepository StaffRepository =>
             _staffRepository ??= _repositoryFactory.GetCustomRepository<IStaffRepository>();
         public IStaffScheduleRepository StaffScheduleRepository =>
-            _staffScheduleRepository ??= _repositoryFactory.GetCustomRepository<IStaffScheduleRepository>();    
+            _staffScheduleRepository ??= _repositoryFactory.GetCustomRepository<IStaffScheduleRepository>();
+        public IServiceRepository ServiceRepository =>
+            _serviceRepository ??= _repositoryFactory.GetCustomRepository<IServiceRepository>();
 
         public IGenericRepository<TEntity, TKey> GetRepository<TEntity, TKey>()
             where TEntity : class
