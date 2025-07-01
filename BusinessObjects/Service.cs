@@ -15,7 +15,7 @@ namespace BusinessObjects
         public double Price { get; set; }
         public string Description { get; set; } = null!;
         public int Duration { get; set; } // Duration in minutes
-        public string imgURL { get; set; } = null!;
+        public string? imgURL { get; set; } = null!;
 
         public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
