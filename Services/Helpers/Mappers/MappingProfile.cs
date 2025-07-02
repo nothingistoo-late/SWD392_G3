@@ -34,6 +34,15 @@ namespace Services.Helpers.Mappers
             // 💥 ADD THIS: Order -> OrderRespondDTO
             CreateMap<Order, OrderRespondDTO>();
 
+            // Customer -> CreateCustomerRequestDTO
+            CreateMap<CreateCustomerRequestDTO, User>()
+                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender)); 
+
             // Customer -> CustomerRespondDTO
             CreateMap<Customer, CustomerRespondDTO>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))

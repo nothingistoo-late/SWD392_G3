@@ -25,6 +25,9 @@ namespace DTOs
         [Required(ErrorMessage = "LastName là bắt buộc")]
         [MaxLength(100)]
         public string LastName { get; set; }
+        [Required(ErrorMessage = "Số điện thoại là bắt buộc")]
+        [MaxLength(100)]
+        public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "giới tính là bắt buộc")]
         public GenderEnums Gender { get; set; }
         [Required(ErrorMessage = "Địa chỉ là bắt buộc")]

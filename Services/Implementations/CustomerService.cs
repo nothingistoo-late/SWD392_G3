@@ -36,14 +36,7 @@ namespace Services.Implementations
                 await _unitOfWork.BeginTransactionAsync(); // 🚀 Mở transaction
 
                 // Bước 1: Tạo User
-                var user = new User
-                {
-                    UserName = dto.Email,
-                    Email = dto.Email,
-                    FirstName = dto.FirstName,
-                    LastName = dto.LastName,
-                    Gender = dto.Gender.ToString()
-                };
+                var user = _mapper.Map<User>(dto);
 
                 var createUserResult = await _userManager.CreateAsync(user, dto.Password);
                 if (!createUserResult.Succeeded)
