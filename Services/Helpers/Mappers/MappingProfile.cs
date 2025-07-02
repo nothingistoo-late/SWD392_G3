@@ -44,9 +44,11 @@ namespace Services.Helpers.Mappers
                 .ReverseMap();
 
             CreateMap<StaffSchedule, StaffScheduleRespondDTO>()
-                .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.StartTime.ToString(@"hh\:mm")))
-                .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.EndTime.ToString(@"hh\:mm")))
-                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note));
+                     .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.StartTime.ToString(@"hh\:mm")))
+                     .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.EndTime.ToString(@"hh\:mm")))
+                     .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note))
+                     .ForMember(dest => dest.staffName, opt => opt.MapFrom(src => src.Staff.User.FullName));
+
 
             CreateMap<Staff, StaffRespondDTO>()
                     .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FirstName + " " + src.User.LastName))

@@ -12,7 +12,7 @@ namespace DTOs.StaffScheduleDTO.Request
         public DayOfWeek DayOfWeek { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
-        public string? Note { get; set; } // Optional note for the schedule
+        public string? Note { get; set; } = string.Empty; // Optional note for the schedule
     }
 
 }

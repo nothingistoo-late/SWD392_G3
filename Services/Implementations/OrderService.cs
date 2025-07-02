@@ -166,32 +166,6 @@ namespace Services.Implementations
             }
         }
 
-
-        //public async Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId)
-        //{
-        //    try
-        //    {
-        //        var order = await _repository.GetByIdAsync(orderId);
-
-        //        if (order == null)
-        //            return ApiResult<OrderRespondDTO>.Failure(new Exception("Không tìm thấy đơn hàng để xóa!"));
-
-        //        order.IsDeleted = true;
-        //        order.DeletedAt = _currentTime.GetVietnamTime();
-        //        order.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
-
-        //        await UpdateAsync(order);
-        //        await _unitOfWork.SaveChangesAsync();
-
-        //        var result = _mapper.Map<OrderRespondDTO>(order);
-        //        return ApiResult<OrderRespondDTO>.Success(result, "Xóa mềm đơn hàng thành công!");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm đơn hàng: " + e.Message));
-        //    }
-        //}
-
         public async Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId)
         {
             try
@@ -213,9 +187,6 @@ namespace Services.Implementations
                 return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm đơn hàng: " + ex.Message));
             }
         }
-
-
-
         public async Task<ApiResult<OrderRespondDTO>> UpdateOrderAsync(UpdateOrderRequestDTO dto)
         {
             await _unitOfWork.BeginTransactionAsync();
@@ -336,18 +307,5 @@ namespace Services.Implementations
             }
         }
 
-        private async Task<Staff?> FindAvailableStaffAsync(Guid serviceId, DateTime start, DateTime end)
-        {
-            var staffs = await _staffCheduleRepository.GetAvailableStaffs(start, end);
-
-            foreach (var staff in staffs)
-            {
-                var conflict = await _orderDetailRepo.HasConflict(staff.Id, start, end);
-                if (!conflict)
-                    return staff;
-            }
-
-            return null;
-        }
     }
 }

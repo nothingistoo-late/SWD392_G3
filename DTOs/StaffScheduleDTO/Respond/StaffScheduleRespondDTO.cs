@@ -13,6 +13,7 @@ namespace DTOs.StaffScheduleDTO.Respond
         public string EndTime { get; set; } = null!;
         public string? Note { get; set; } // Optional note for the schedule
 
+        public string? staffName { get; set; } // Optional, can be null if not needed
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObjects.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,6 +24,7 @@ namespace BusinessObjects
         public Guid StaffId { get; set; }
         public virtual Staff Staff { get; set; } = null!;
         public DateTime ScheduleTime { get; set; }
+        public OrderDetailStatus Status { get; set; } = OrderDetailStatus.Pending;
         public string? Note { get; set; } = null!;
         public virtual Rating? Rating { get; set; }
 
