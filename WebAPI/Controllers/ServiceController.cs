@@ -43,6 +43,16 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("filter")]
+        public async Task<IActionResult> GetServicesByFilter([FromBody] ServiceFilterDTO filter)
+        {
+            var result = await _serviceService.GetServicesByFilterAsync(filter);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+            return Ok(result);
+        }
+
+
         // PUT: api/services
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateServiceRequest request)

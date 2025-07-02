@@ -425,15 +425,16 @@ namespace Repositories
                 {
                     Id = Guid.NewGuid(),
                     FirstName = "Manager",
-                    LastName = "Tổng manager",
-                    Email = "manager@example.com",
-                    UserName = "Manager",
+                    LastName = "And Admin",
+                    Email = "managerAdmin@example.com",
+                    UserName = "ManagerAdmin",
                     PhoneNumber = "0961111111",
                     Gender = "Nam",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
                 await CreateUserAsync(userManager, manager, "string", "MANAGER");
+                await userManager.AddToRoleAsync(manager, "Admin");
                 var managerr = new Manager
                 {
                     UserId = manager.Id,

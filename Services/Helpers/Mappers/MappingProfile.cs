@@ -4,6 +4,8 @@ using DTOs.Customer.Responds;
 using DTOs.OrderDTO.Respond;
 using DTOs.ServiceDTO.Request;
 using DTOs.ServiceDTO.Respond;
+using DTOs.StaffDTO.Respond;
+using DTOs.StaffScheduleDTO.Respond;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +42,18 @@ namespace Services.Helpers.Mappers
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender.ToString()))
                 .ReverseMap();
+
+            CreateMap<StaffSchedule, StaffScheduleRespondDTO>()
+                .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.StartTime.ToString(@"hh\:mm")))
+                .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.EndTime.ToString(@"hh\:mm")))
+                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note));
+
+            CreateMap<Staff, StaffRespondDTO>()
+                    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FirstName + " " + src.User.LastName))
+                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                    .ForMember(dest => dest.ImgURL, opt => opt.MapFrom(src => src.ImgURL))
+                    .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note));
+
         }
     }
 }

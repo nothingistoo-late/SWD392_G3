@@ -15,6 +15,7 @@ namespace Services.Interfaces
         Task<ApiResult<List<ServiceRespondDTO>>> GetAllServicesAsync();
         Task<ApiResult<ServiceRespondDTO>> UpdateServiceById(UpdateServiceRequest request);
         Task<ApiResult<ServiceRespondDTO>> SoftDeleteServiceById(Guid serviceId);
+        Task<ApiResult<List<ServiceRespondDTO>>> GetServicesByFilterAsync(ServiceFilterDTO filter);
 
     }
 }

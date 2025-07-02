@@ -76,32 +76,6 @@ namespace Services.Implementations
             }
         }
 
-        //public async Task<ApiResult<ServiceRespondDTO>> SoftDeleteServiceById(Guid serviceId)
-        //{
-        //    try
-        //    {
-        //        var service = await _repository.GetByIdAsync(serviceId);
-        //        if (service == null)
-        //        {
-        //            return ApiResult<ServiceRespondDTO>.Failure(new Exception("Không tìm thấy dịch vụ với Id: " + serviceId));
-        //        }
-        //        if (service.IsDeleted)
-        //        {
-        //            return ApiResult<ServiceRespondDTO>.Failure(new Exception("Dịch vụ này đã bị xóa trước đó."));
-        //        }
-
-        //        service.IsDeleted = true;
-        //        service.DeletedAt = _currentTime.GetVietnamTime();
-        //        service.DeletedBy = _currentUserService.GetUserId() ?? Guid.Empty;
-        //        await UpdateAsync(service);
-        //        return ApiResult<ServiceRespondDTO>.Success(_mapper.Map<ServiceRespondDTO>(service), "Xóa dịch vụ thành công!!");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return ApiResult<ServiceRespondDTO>.Failure(new Exception("Lỗi khi xóa dịch vụ!!" + e.Message));
-        //    }
-        //}
-
         public async Task<ApiResult<ServiceRespondDTO>> SoftDeleteServiceById(Guid serviceId)
         {
             try
@@ -123,10 +97,6 @@ namespace Services.Implementations
                 return ApiResult<ServiceRespondDTO>.Failure(new Exception("Lỗi khi xóa mềm dịch vụ: " + ex.Message));
             }
         }
-
-
-
-
 
         public async Task<ApiResult<ServiceRespondDTO>> UpdateServiceById(UpdateServiceRequest request)
         {
@@ -170,6 +140,38 @@ namespace Services.Implementations
                 return ApiResult<ServiceRespondDTO>.Failure(new Exception("Lỗi khi cập nhật dịch vụ!!" + e.Message));
             }
         }
+
+
+        public async Task<ApiResult<List<ServiceRespondDTO>>> GetServicesByFilterAsync(ServiceFilterDTO filter)
+        {
+            // 👉 Validate tay cho chắc
+            if (filter.MinPrice.HasValue && filter.MaxPrice.HasValue && filter.MinPrice > filter.MaxPrice)
+                return ApiResult<List<ServiceRespondDTO>>.Failure(new Exception("MinPrice không được lớn hơn MaxPrice."));
+
+            if (filter.MinDuration.HasValue && filter.MaxDuration.HasValue && filter.MinDuration > filter.MaxDuration)
+                return ApiResult<List<ServiceRespondDTO>>.Failure(new Exception("MinDuration không được lớn hơn MaxDuration."));
+
+            try
+            {
+                var services = await _unitOfWork.ServiceRepository.GetAllAsync(
+                    predicate: s =>
+                        (filter.IncludeDeleted || !s.IsDeleted) &&
+                        (string.IsNullOrWhiteSpace(filter.Name) || s.Name.ToLower().Contains(filter.Name.ToLower())) &&
+                        (!filter.MinPrice.HasValue || s.Price >= filter.MinPrice.Value) &&
+                        (!filter.MaxPrice.HasValue || s.Price <= filter.MaxPrice.Value) &&
+                        (!filter.MinDuration.HasValue || s.Duration >= filter.MinDuration.Value) &&
+                        (!filter.MaxDuration.HasValue || s.Duration <= filter.MaxDuration.Value)
+                );
+
+                var mapped = _mapper.Map<List<ServiceRespondDTO>>(services);
+                return ApiResult<List<ServiceRespondDTO>>.Success(mapped, "Lọc và lấy dịch vụ theo bộ lọc thành công!!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<ServiceRespondDTO>>.Failure(new Exception("Lỗi khi lọc dịch vụ: " + ex.Message));
+            }
+        }
+
 
     }
 }

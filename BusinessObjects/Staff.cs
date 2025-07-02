@@ -16,6 +16,8 @@ namespace BusinessObjects
         public virtual User User { get; set; } = null!;
         public double Salary { get; set; }
         public DateTime HireDate { get; set; }
+        public string? ImgURL { get; set; } = string.Empty;
+        public string? Note { get; set; } // 👈 NEW
         public virtual ICollection<StaffSchedule> StaffSchedules { get; set; } 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } 
     }
