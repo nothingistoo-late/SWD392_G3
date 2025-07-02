@@ -13,7 +13,6 @@ namespace DTOs.ServiceDTO.Request
         public double? MaxPrice { get; set; }
         public int? MinDuration { get; set; }
         public int? MaxDuration { get; set; }
-        public bool IncludeDeleted { get; set; } = false;
     }
 
 }

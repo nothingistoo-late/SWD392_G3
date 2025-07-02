@@ -155,13 +155,17 @@ namespace Services.Implementations
             {
                 var services = await _unitOfWork.ServiceRepository.GetAllAsync(
                     predicate: s =>
-                        (filter.IncludeDeleted || !s.IsDeleted) &&
                         (string.IsNullOrWhiteSpace(filter.Name) || s.Name.ToLower().Contains(filter.Name.ToLower())) &&
                         (!filter.MinPrice.HasValue || s.Price >= filter.MinPrice.Value) &&
                         (!filter.MaxPrice.HasValue || s.Price <= filter.MaxPrice.Value) &&
                         (!filter.MinDuration.HasValue || s.Duration >= filter.MinDuration.Value) &&
                         (!filter.MaxDuration.HasValue || s.Duration <= filter.MaxDuration.Value)
                 );
+
+                if (services == null || !services.Any())
+                {
+                    return ApiResult<List<ServiceRespondDTO>>.Failure(new Exception("Không tìm thấy dịch vụ nào phù hợp với bộ lọc."));
+                }
 
                 var mapped = _mapper.Map<List<ServiceRespondDTO>>(services);
                 return ApiResult<List<ServiceRespondDTO>>.Success(mapped, "Lọc và lấy dịch vụ theo bộ lọc thành công!!");
