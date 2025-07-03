@@ -60,7 +60,7 @@ namespace Services.Helpers.Mappers
 
 
             CreateMap<Staff, StaffRespondDTO>()
-                    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FirstName + " " + src.User.LastName))
+                    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
                     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                     .ForMember(dest => dest.ImgURL, opt => opt.MapFrom(src => src.ImgURL))
                     .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note));
