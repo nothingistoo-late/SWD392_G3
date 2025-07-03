@@ -78,5 +78,13 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("staff/{staffId}")]
+        public async Task<IActionResult> GetOrdersByStaffId(Guid staffId)
+        {
+            var result = await _orderService.GetOrdersByStaffIdAsync(staffId);
+            return Ok(result); 
+        }
+
+
     }
 }

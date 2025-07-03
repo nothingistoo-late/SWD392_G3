@@ -18,5 +18,6 @@ namespace Services.Interfaces
         Task<ApiResult<bool>> CancelWholeOrderAsync(Guid orderId);
 
         Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId);
+        Task<List<OrderRespondDTO>> GetOrdersByStaffIdAsync(Guid staffId);
     }
 }

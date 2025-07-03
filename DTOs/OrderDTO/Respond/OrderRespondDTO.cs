@@ -1,4 +1,6 @@
-﻿using DTOs.ServiceDTO.Respond;
+﻿using BusinessObjects;
+using BusinessObjects.Common;
+using DTOs.ServiceDTO.Respond;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,9 @@ namespace DTOs.OrderDTO.Respond
     {
         public Guid ServiceId { get; set; }
         public string ServiceName { get; set; } = default!;
+        public OrderDetailStatus Status { get; set; } 
+        public string? Note { get; set; } = null!;
+        public virtual Rating? Rating { get; set; }
         public DateTime ScheduledTime { get; set; }
         public Guid StaffId { get; set; }
         public string StaffName { get; set; } = default!;

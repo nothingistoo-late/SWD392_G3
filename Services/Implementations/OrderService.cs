@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DTOs.OrderDTO.Request;
 using DTOs.OrderDTO.Respond;
+using Microsoft.EntityFrameworkCore;
+using Repositories;
 using Repositories.Implements;
 using Repositories.Interfaces;
 using Services.Commons;
@@ -19,14 +21,16 @@ namespace Services.Implementations
         private readonly IServiceRepository _serviceRepository;
         private readonly IStaffScheduleRepository _staffCheduleRepository;
         private readonly IOrderDetailRepository _orderDetailRepo;
+        private readonly SWD392_G3DBcontext _context;
 
-        public OrderService(IOrderDetailRepository orderDetailRepository, IStaffScheduleRepository staffCheduleRepository, IServiceRepository serviceRepository, IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
+        public OrderService(SWD392_G3DBcontext context, IOrderDetailRepository orderDetailRepository, IStaffScheduleRepository staffCheduleRepository, IServiceRepository serviceRepository, IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
         {
             _mapper = mapper;
             _orderRepository = orderRepository;
             _serviceRepository = serviceRepository;
             _staffCheduleRepository = staffCheduleRepository;
             _orderDetailRepo = orderDetailRepository;
+            _context = context;
         }
 
         public async Task<ApiResult<OrderRespondDTO>> CreateOrderAsync(CreateOrderRequestDTO dto)
@@ -353,6 +357,24 @@ namespace Services.Implementations
             {
                 return ApiResult<bool>.Failure(new Exception("Lỗi khi huỷ đơn hàng: " + ex.Message));
             }
+        }
+
+        public async Task<List<OrderRespondDTO>> GetOrdersByStaffIdAsync(Guid staffId)
+        {
+            var orders = await _context.Orders
+                .Where(o => !o.IsDeleted && o.OrderDetails.Any(od => od.StaffId == staffId && !od.IsDeleted))
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.OrderDetails
+                    .Where(od => !od.IsDeleted && od.StaffId == staffId)) // chỉ lấy các OrderDetail của staff này
+                    .ThenInclude(od => od.Service)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Staff)
+                        .ThenInclude(s => s.User)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
+            return _mapper.Map<List<OrderRespondDTO>>(orders);
         }
 
 
