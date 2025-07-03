@@ -14,6 +14,16 @@ namespace WebAPI.Controllers
             _userService = userService;
         }
 
+        [HttpGet("get-current-user")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var response = await _userService.GetCurrentUserAsync();
+            if (!response.IsSuccess)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
         //[HttpGet("{id}")]
         //public async Task<IActionResult> GetUserById(Guid id)
         //{
