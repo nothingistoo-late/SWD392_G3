@@ -359,7 +359,7 @@ namespace Services.Implementations
             }
         }
 
-        public async Task<List<OrderRespondDTO>> GetOrdersByStaffIdAsync(Guid staffId)
+        public async Task<ApiResult<List<OrderRespondDTO>>> GetOrdersByStaffIdAsync(Guid staffId)
         {
             var orders = await _context.Orders
                 .Where(o => !o.IsDeleted && o.OrderDetails.Any(od => od.StaffId == staffId && !od.IsDeleted))
@@ -373,8 +373,12 @@ namespace Services.Implementations
                         .ThenInclude(s => s.User)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
-
-            return _mapper.Map<List<OrderRespondDTO>>(orders);
+            var result = _mapper.Map<List<OrderRespondDTO>>(orders);
+            if (result == null || !result.Any())
+            {
+                return ApiResult<List<OrderRespondDTO>>.Failure(new Exception("Không tìm thấy đơn hàng cho nhân viên này."));
+            }
+            return ApiResult<List<OrderRespondDTO>>.Success(result, "Lấy đơn hàng của nhân viên thành công!");
         }
 
 
