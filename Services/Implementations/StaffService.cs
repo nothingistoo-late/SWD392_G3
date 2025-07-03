@@ -154,24 +154,19 @@ namespace Services.Implementations
         {
             try
             {
-                // 🚫 Manual validation
-                if (filter.MinSalary.HasValue && filter.MinSalary < 0)
-                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("MinSalary không được nhỏ hơn 0."));
+                // ✅ Validate input
+                if (filter.MinSalary < 0 || filter.MaxSalary < 0)
+                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("Lương không được nhỏ hơn 0."));
 
-                if (filter.MaxSalary.HasValue && filter.MaxSalary < 0)
-                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("MaxSalary không được nhỏ hơn 0."));
-
-                if (filter.MinSalary.HasValue && filter.MaxSalary.HasValue &&
-                    filter.MinSalary > filter.MaxSalary)
+                if (filter.MinSalary > filter.MaxSalary)
                     return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("MinSalary không được lớn hơn MaxSalary."));
 
-                if (filter.HireDateFrom.HasValue && filter.HireDateTo.HasValue &&
-                    filter.HireDateFrom > filter.HireDateTo)
-                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("HireDateFrom không được sau HireDateTo."));
+                if (filter.HireDateFrom > filter.HireDateTo)
+                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("Ngày tuyển không hợp lệ."));
 
+                // ✅ Lấy danh sách ban đầu từ DB
                 var staffs = await _unitOfWork.StaffRepository.GetAllAsync(
                     predicate: s =>
-                        (string.IsNullOrEmpty(filter.Name) || s.User.FullName.ToLower().Contains(filter.Name.ToLower())) &&
                         (!filter.MinSalary.HasValue || s.Salary >= filter.MinSalary.Value) &&
                         (!filter.MaxSalary.HasValue || s.Salary <= filter.MaxSalary.Value) &&
                         (!filter.HireDateFrom.HasValue || s.HireDate >= filter.HireDateFrom.Value) &&
@@ -179,17 +174,25 @@ namespace Services.Implementations
                     includes: s => s.User
                 );
 
-                if (staffs == null || !staffs.Any())
-                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("Không tìm thấy nhân viên nào phù hợp với bộ lọc."));
+                // ✅ Lọc tên ở phía client
+                if (!string.IsNullOrEmpty(filter.Name))
+                {
+                    var lowerKeyword = filter.Name.ToLower();
+                    staffs = staffs.Where(s => s.User.FullName.ToLower().Contains(lowerKeyword)).ToList();
+                }
+
+                if (!staffs.Any())
+                    return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("Không tìm thấy nhân viên nào phù hợp."));
 
                 var respond = _mapper.Map<List<StaffRespondDTO>>(staffs);
-                return ApiResult<List<StaffRespondDTO>>.Success(respond,"Lọc và lấy nhân viên theo bộ lọc thành công!!");
+                return ApiResult<List<StaffRespondDTO>>.Success(respond, "Lọc nhân viên thành công.");
             }
             catch (Exception ex)
             {
                 return ApiResult<List<StaffRespondDTO>>.Failure(new Exception("Lỗi khi lọc nhân viên: " + ex.Message));
             }
         }
+
 
         // ✅ 5. Soft Delete 
 
@@ -247,6 +250,26 @@ namespace Services.Implementations
 
             return ApiResult<BulkStaffDeleteResultDTO>.Success(resultDto, "Xoá mềm nhiều nhân viên đã xử lý xong.");
         }
+
+        public async Task<ApiResult<StaffRespondDTO>> GetStaffByIdAsync(Guid staffId)
+        {
+            try
+            {
+                var staff = await _unitOfWork.StaffRepository
+                    .GetByIdAsync(staffId, includes: s => s.User);
+
+                if (staff == null || staff.IsDeleted)
+                    return ApiResult<StaffRespondDTO>.Failure(new Exception("Không tìm thấy nhân viên."));
+
+                var result = _mapper.Map<StaffRespondDTO>(staff);
+                return ApiResult<StaffRespondDTO>.Success(result, "Lấy thông tin nhân viên thành công.");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<StaffRespondDTO>.Failure(new Exception("Lỗi khi lấy nhân viên: " + ex.Message));
+            }
+        }
+
 
     }
 }

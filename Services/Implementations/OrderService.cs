@@ -307,5 +307,54 @@ namespace Services.Implementations
             }
         }
 
+        public async Task<ApiResult<bool>> MarkWholeOrderCompletedAsync(Guid orderId)
+        {
+            try
+            {
+                var order = await _unitOfWork.OrderRepository.GetFullOrderByIdAsync(orderId);
+                if (order == null || order.IsDeleted)
+                    return ApiResult<bool>.Failure(new Exception("Không tìm thấy order."));
+
+                foreach (var detail in order.OrderDetails.Where(d => !d.IsDeleted))
+                {
+                    detail.Status = OrderDetailStatus.Completed;
+                }
+
+                order.Status = OrderStatus.Done;
+
+                await _unitOfWork.SaveChangesAsync();
+                return ApiResult<bool>.Success(true, "Đã đánh dấu toàn bộ đơn hàng là hoàn thành.");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Failure(new Exception("Lỗi khi cập nhật đơn hàng: " + ex.Message));
+            }
+        }
+
+        public async Task<ApiResult<bool>> CancelWholeOrderAsync(Guid orderId)
+        {
+            try
+            {
+                var order = await _unitOfWork.OrderRepository.GetFullOrderByIdAsync(orderId);
+                if (order == null || order.IsDeleted)
+                    return ApiResult<bool>.Failure(new Exception("Không tìm thấy order."));
+
+                foreach (var detail in order.OrderDetails.Where(d => !d.IsDeleted))
+                {
+                    detail.Status = OrderDetailStatus.Cancelled;
+                }
+
+                order.Status = OrderStatus.Cancelled;
+
+                await _unitOfWork.SaveChangesAsync();
+                return ApiResult<bool>.Success(true, "Đã huỷ toàn bộ đơn hàng.");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Failure(new Exception("Lỗi khi huỷ đơn hàng: " + ex.Message));
+            }
+        }
+
+
     }
 }

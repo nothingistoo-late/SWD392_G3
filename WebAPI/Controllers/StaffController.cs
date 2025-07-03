@@ -78,6 +78,13 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _staffService.GetStaffByIdAsync(id);
+            return result.IsSuccess ? Ok(result) : NotFound(result);
+        }
+
 
     }
 }

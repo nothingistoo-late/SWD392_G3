@@ -63,5 +63,20 @@ namespace WebAPI.Controllers
             var result = await _orderService.SoftDeleteOrderById(id);
             return result.IsSuccess ? Ok(result) : NotFound(result);
         }
+
+        [HttpPatch("{orderId}/complete")]
+        public async Task<IActionResult> MarkOrderCompleted(Guid orderId)
+        {
+            var result = await _orderService.MarkWholeOrderCompletedAsync(orderId);
+            return Ok(result);
+        }
+
+        [HttpPatch("{orderId}/cancel")]
+        public async Task<IActionResult> CancelOrder(Guid orderId)
+        {
+            var result = await _orderService.CancelWholeOrderAsync(orderId);
+            return Ok(result);
+        }
+
     }
 }

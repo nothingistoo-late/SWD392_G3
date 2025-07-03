@@ -16,5 +16,7 @@ namespace Services.Interfaces
         Task<ApiResult<List<StaffRespondDTO>>> GetAllStaffAsync();
         Task<ApiResult<BulkStaffDeleteResultDTO>> SoftDeleteManyStaffAsync(List<Guid> staffIds);
         Task<ApiResult<List<StaffRespondDTO>>> GetStaffByFilterAsync(StaffFilterDTO filter);
+        Task<ApiResult<StaffRespondDTO>> GetStaffByIdAsync(Guid staffId);
+
     }
 }
