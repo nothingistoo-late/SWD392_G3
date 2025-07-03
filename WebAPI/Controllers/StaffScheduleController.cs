@@ -85,6 +85,13 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllStaffSchedules()
+        {
+            var result = await _staffScheduleService.GetAllStaffSchedulesAsync();
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
 
+        }
     }
 }

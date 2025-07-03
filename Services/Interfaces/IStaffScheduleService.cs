@@ -17,5 +17,7 @@ namespace Services.Interfaces
         Task<ApiResult<List<StaffScheduleRespondDTO>>> FilterSchedulesAsync(StaffScheduleFilterDTO filter);
         Task<ApiResult<List<AvailableSlotDTO>>> GetAvailableSlotsAsync(StaffAvailableSlotsRequestDTO request);
         Task<ApiResult<List<AvailableStaffDTO>>> GetAvailableStaffInTimeRangeAsync(AvailableStaffRequestDTO dto);
+
+        Task<ApiResult<List<StaffScheduleRespondDTO>>> GetAllStaffSchedulesAsync();
     }
 }

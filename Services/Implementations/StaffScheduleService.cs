@@ -293,6 +293,31 @@ namespace Services.Implementations
             }
         }
 
+        public async Task<ApiResult<List<StaffScheduleRespondDTO>>> GetAllStaffSchedulesAsync()
+        {
+            try
+            {
+                var schedules = await _unitOfWork.StaffScheduleRepository
+                    .GetAllAsync(null, includes: s => s.Staff.User);
+
+                var result = schedules.Select(s => new StaffScheduleRespondDTO
+                {
+                    DayOfWeek = s.DayOfWeek,
+                    StartTime = s.StartTime.ToString(@"hh\:mm"),
+                    EndTime = s.EndTime.ToString(@"hh\:mm"),
+                    Note = s.Note,
+                    staffName = s.Staff.User.FullName
+                }).OrderBy(s => s.staffName)         // 👉 Sắp xếp theo tên nhân viên (A-Z)
+                  .ThenBy(s => s.DayOfWeek).ToList();
+
+                return ApiResult<List<StaffScheduleRespondDTO>>.Success(result, "Lấy toàn bộ lịch làm việc thành công.");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<StaffScheduleRespondDTO>>.Failure(new Exception("Lỗi khi lấy danh sách lịch làm việc: " + ex.Message));
+            }
+        }
+
 
         private List<(TimeSpan, TimeSpan)> SubtractRange((TimeSpan Start, TimeSpan End) available, (TimeSpan Start, TimeSpan End) busy)
         {
