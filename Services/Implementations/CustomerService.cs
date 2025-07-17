@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DTOs;
+using DTOs.Customer.Request;
 using DTOs.Customer.Responds;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -100,6 +101,36 @@ namespace Services.Implementations
             }
         }
 
+        public async Task<ApiResult<MyProfileResponse?>> GetMyProfileAsync()
+        {
+            try
+            {
+                var userId = _currentUserService.GetUserId();
+                if (userId == null)
+                {
+                    return ApiResult<MyProfileResponse?>.Failure(new Exception("Không tìm thấy thông tin người dùng hiện tại!!\n Hãy thử đăng nhập lại và thử lại sau!!"));
+                }
+
+                var customer = await _unitOfWork.CustomerRepository
+                                   .GetQueryable()
+                                   .Include(c => c.User)
+                                   .Where(c => c.UserId == userId)
+                                   .FirstOrDefaultAsync();
+                if (customer == null || customer.IsDeleted)
+                {
+                    return ApiResult<MyProfileResponse?>.Failure(new Exception("Không tìm thấy thông tin cá nhân của bạn!"));
+                }
+
+                var resultDto = _mapper.Map<MyProfileResponse>(customer);
+                return ApiResult<MyProfileResponse?>.Success(resultDto, "Lấy thông tin cá nhân thành công!");
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi khi lấy thông tin cá nhân: " + ex.Message);
+            }
+        }
+
         //public async Task<ApiResult<CustomerRespondDTO>> SoftDeleteCustomerById(Guid customerId)
         //{
         //    try
@@ -163,8 +194,66 @@ namespace Services.Implementations
             }
         }
 
+        public async Task<ApiResult<MyProfileResponse>> UpdateMyProfileAsync(UpdateMyProfileRequest request)
+        {
+            try
+            {
+
+                var userId = _currentUserService.GetUserId();
+                if (userId == null)
+                {
+                    return ApiResult<MyProfileResponse>.Failure(new Exception("Không tìm thấy thông tin người dùng hiện tại!!\n Hãy thử đăng nhập lại và thử lại sau!!"));
+                }
+
+                var customer = await _unitOfWork.CustomerRepository
+                    .GetQueryable()
+                    .Include(c => c.User)
+                    .Where(c => c.UserId == userId)
+                    .FirstOrDefaultAsync();
+
+                if (customer == null)
+                    return ApiResult<MyProfileResponse>.Failure(new Exception("Customer not found"));
+
+                var user = customer.User;
+
+                // --- USER ---
+                if (!string.IsNullOrWhiteSpace(request.FirstName))
+                    user.FirstName = request.FirstName;
+
+                if (!string.IsNullOrWhiteSpace(request.LastName))
+                    user.LastName = request.LastName;
+
+                if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+                    user.LastName = request.PhoneNumber;
+
+                if (request.Gender.HasValue)
+                    user.Gender = request.Gender.Value.ToString(); // ví dụ "Male"
+
+                user.UpdatedAt = DateTime.UtcNow;
+                user.UpdatedBy = userId.Value;
+
+                // --- CUSTOMER ---
+                if (!string.IsNullOrWhiteSpace(request.Address))
+                    customer.Address = request.Address;
+
+                if (!string.IsNullOrWhiteSpace(request.ImgURL))
+                    customer.imgURL = request.ImgURL;
 
 
+                customer.UpdatedAt = DateTime.UtcNow;
+                customer.UpdatedBy = userId.Value;
 
+                await _unitOfWork.CustomerRepository.UpdateAsync(customer);
+                await _unitOfWork.SaveChangesAsync();
+
+                // Map kết quả trả về
+                var result = _mapper.Map<MyProfileResponse>(customer);
+                return ApiResult<MyProfileResponse>.Success(result,"Cập nhật thông tin cá nhân thành công!!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<MyProfileResponse>.Failure(new Exception("Lỗi khi cập nhật thông tin cá nhân: " + ex.Message));
+            }
+        }
     }
 }

@@ -7,6 +7,8 @@ namespace Repositories.WorkSeeds.Interfaces
     {
         // Repository cho người dùng
         IUserRepository UserRepository { get; }
+
+        ICustomerRepository CustomerRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
         IOrderRepository OrderRepository { get; }
         IServiceRepository ServiceRepository { get; }

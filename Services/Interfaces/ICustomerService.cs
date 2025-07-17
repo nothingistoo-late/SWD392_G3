@@ -16,5 +16,8 @@ namespace Services.Interfaces
         Task<ApiResult<List<CustomerRespondDTO>>> GetAllCustomersAsync();
         //Task<ApiResult<CustomerRespondDTO>> UpdateCustomerById(UpdateCustomerRequestDTO request);
         Task<ApiResult<CustomerRespondDTO>> SoftDeleteCustomerById(Guid customerId);
+
+        Task<ApiResult<MyProfileResponse?>> GetMyProfileAsync();
+        Task<ApiResult<MyProfileResponse>> UpdateMyProfileAsync(UpdateMyProfileRequest request);
     }
 }

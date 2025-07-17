@@ -12,7 +12,6 @@ namespace BusinessObjects
     {
         [Key, ForeignKey(nameof(User))]
         public Guid UserId { get; set; }
-
         public virtual User User { get; set; } = null!;
         public string Address { get; set; } = null!;
         public string? imgURL { get; set; } = null!;

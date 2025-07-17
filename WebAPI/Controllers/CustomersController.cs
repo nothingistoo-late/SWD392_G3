@@ -1,4 +1,5 @@
 ﻿using DTOs;
+using DTOs.Customer.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -21,6 +22,8 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAllCustomers()
         {
             var result = await _customerService.GetAllCustomersAsync();
+            if (!result.IsSuccess)
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -57,6 +60,33 @@ namespace WebAPI.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Lấy thông tin cá nhân của customer hiện tại (dựa trên token)
+        /// </summary>
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyProfile()
+        {
+            var result = await _customerService.GetMyProfileAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin profile (chỉ sửa những trường được truyền lên)
+        /// </summary>
+        [HttpPut("me")]
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateMyProfileRequest request)
+        {
+            var result = await _customerService.UpdateMyProfileAsync(request);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+            return Ok(result); // trả về ApiResult<MyProfileResponse>
         }
     }
 }

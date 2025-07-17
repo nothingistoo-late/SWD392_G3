@@ -65,6 +65,12 @@ namespace Services.Helpers.Mappers
                     .ForMember(dest => dest.ImgURL, opt => opt.MapFrom(src => src.ImgURL))
                     .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note));
 
+           CreateMap<Customer, MyProfileResponse>()
+          .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
+          .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
+          .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+          .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender)).ReverseMap();
+
         }
     }
 }
