@@ -381,6 +381,22 @@ namespace Services.Implementations
             return ApiResult<List<OrderRespondDTO>>.Success(result, "Lấy đơn hàng của nhân viên thành công!");
         }
 
+        public async Task<ApiResult<List<OrderRespondDTO>>> GetAllOrdersByCustomerIdAsync(Guid customerId)
+        {
+            try
+            {
+                var orders = await _orderRepository.GetAllWithCustomerIdAndServiceAsync(customerId);
+
+                if (orders == null || !orders.Any())
+                    return ApiResult<List<OrderRespondDTO>>.Failure(new Exception("Không tìm thấy đơn hàng cho khách hàng này!"));
+                var result = _mapper.Map<List<OrderRespondDTO>>(orders);
+                return ApiResult<List<OrderRespondDTO>>.Success(result, "Lấy tất cả đơn hàng thành công!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<OrderRespondDTO>>.Failure(new Exception("Lỗi khi lấy danh sách đơn hàng: " + ex.Message));
+            }
+        }
 
     }
 }

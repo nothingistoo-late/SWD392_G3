@@ -16,8 +16,9 @@ namespace Services.Interfaces
         Task<ApiResult<OrderRespondDTO>> UpdateOrderAsync(UpdateOrderRequestDTO dto);
         Task<ApiResult<bool>> MarkWholeOrderCompletedAsync(Guid orderId);
         Task<ApiResult<bool>> CancelWholeOrderAsync(Guid orderId);
-
         Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId);
         Task<ApiResult<List<OrderRespondDTO>>> GetOrdersByStaffIdAsync(Guid staffId);
+        Task<ApiResult<List<OrderRespondDTO>>> GetAllOrdersByCustomerIdAsync(Guid customerId);
+
     }
 }

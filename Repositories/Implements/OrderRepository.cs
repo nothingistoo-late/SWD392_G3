@@ -55,7 +55,17 @@ namespace Repositories.Implements
                         !od.Staff.User.IsDeleted));
         }
 
-
+        public async Task<List<Order>> GetAllWithCustomerIdAndServiceAsync(Guid customerid)
+        {
+            return await _context.Orders
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Service)
+                .OrderByDescending(o => o.CreatedAt)
+                .Where(o => o.CustomerId == customerid)
+                .ToListAsync();
+        }
 
     }
 }

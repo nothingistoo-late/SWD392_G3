@@ -85,6 +85,12 @@ namespace WebAPI.Controllers
             return Ok(result); 
         }
 
+        [HttpGet("customer/{customerId}")]
+        public async Task<IActionResult> GetAllByCustomerId(Guid customerId)
+        {
+            var result = await _orderService.GetAllOrdersByCustomerIdAsync(customerId);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
 
     }
 }
