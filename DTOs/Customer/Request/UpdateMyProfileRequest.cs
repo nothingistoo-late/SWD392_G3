@@ -13,7 +13,6 @@ namespace DTOs.Customer.Request
         // Thuộc User
         public string? FirstName { get; set; } = null!;
         public string? LastName { get; set; } = null!;
-
         public string? PhoneNumber { get; set; }
         public GenderEnums? Gender { get; set; } = null!;
 

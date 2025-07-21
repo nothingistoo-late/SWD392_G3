@@ -18,6 +18,10 @@ namespace Repositories
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<StaffSchedule> StaffSchedules { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Membership> Memberships { get; set; }
+        public DbSet<CustomerMembership> CustomerMemberships { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

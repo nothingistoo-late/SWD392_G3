@@ -15,7 +15,7 @@ namespace DTOs.Customer.Responds
         public string FullName => $"{LastName} {FirstName}".Trim();
         public string Email { get; set; } = null!;
         public string Gender { get; set; } = null!;
-
+        public string Phone { get; set; } = null!;
         // Customer
         public string Address { get; set; } = null!;
         public string? ImgURL { get; set; }

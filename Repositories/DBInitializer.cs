@@ -10,6 +10,67 @@ namespace Repositories
             SWD392_G3DBcontext context,
             UserManager<User> userManager)
         {
+
+            #region Seeed Memberships
+            if (!context.Memberships.Any())
+            {
+                var memberships = new List<Membership>
+                {
+                   new Membership
+                    {
+                        Name = "Basic",
+                        Price = 0,
+                        Description = "Gói miễn phí cơ bản dành cho khách mới.",
+                        DurationInDays = 0,
+                        DiscountPercentage = 0,
+                        ImageUrl = "https://example.com/membership-basic.png",
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Membership
+                    {
+                        Name = "Bronze",
+                        Price = 99000,
+                        Description = "Giảm giá nhẹ nhàng cho các đơn hàng nhỏ.",
+                        DurationInDays = 30,
+                        DiscountPercentage = 5,
+                        ImageUrl = "https://example.com/membership-bronze.png",
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Membership
+                    {
+                        Name = "Silver",
+                        Price = 199000,
+                        Description = "Ưu đãi ổn định cho khách thường xuyên.",
+                        DurationInDays = 60,
+                        DiscountPercentage = 10,
+                        ImageUrl = "https://example.com/membership-silver.png",
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Membership
+                    {
+                        Name = "Gold",
+                        Price = 299000,
+                        Description = "Giảm mạnh tay cho đơn hàng lớn và combo.",
+                        DurationInDays = 90,
+                        DiscountPercentage = 15,
+                        ImageUrl = "https://example.com/membership-gold.png",
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Membership
+                    {
+                        Name = "Platinum",
+                        Price = 499000,
+                        Description = "Tối đa hóa lợi ích cho khách VIP.",
+                        DurationInDays = 180,
+                        DiscountPercentage = 20,
+                        ImageUrl = "https://example.com/membership-platinum.png",
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
+                await context.AddRangeAsync(memberships);
+                await context.SaveChangesAsync();
+            }
+            #endregion
             #region Seed Roles
             if (!context.Roles.Any())
             {
@@ -416,8 +477,7 @@ namespace Repositories
                     await CreateUserAsync(userManager, customer, "string", "USER");
             }
             #endregion
-
-            #region
+            #region Seed Manager
             if (!context.Managers.Any())
             {
                 // Seed Manager

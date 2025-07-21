@@ -19,17 +19,13 @@ namespace Services.Implementations
         private readonly IMapper _mapper; 
         private readonly IOrderRepository _orderRepository;
         private readonly IServiceRepository _serviceRepository;
-        private readonly IStaffScheduleRepository _staffCheduleRepository;
-        private readonly IOrderDetailRepository _orderDetailRepo;
         private readonly SWD392_G3DBcontext _context;
 
-        public OrderService(SWD392_G3DBcontext context, IOrderDetailRepository orderDetailRepository, IStaffScheduleRepository staffCheduleRepository, IServiceRepository serviceRepository, IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
+        public OrderService(SWD392_G3DBcontext context, IOrderDetailRepository orderDetailRepository,  IServiceRepository serviceRepository, IMapper mapper, IOrderRepository orderRepository, IGenericRepository<Order, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
         {
             _mapper = mapper;
             _orderRepository = orderRepository;
             _serviceRepository = serviceRepository;
-            _staffCheduleRepository = staffCheduleRepository;
-            _orderDetailRepo = orderDetailRepository;
             _context = context;
         }
 
