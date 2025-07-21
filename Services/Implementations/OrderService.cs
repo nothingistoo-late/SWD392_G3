@@ -43,15 +43,13 @@ namespace Services.Implementations
                 if (customer == null || customer.IsDeleted)
                     return ApiResult<OrderRespondDTO>.Failure(new Exception($"Khách hàng với ID {dto.CustomerId} không tồn tại."));
 
-                if (dto.OrderDate < _currentTime.GetVietnamTime())
-                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt hàng "+dto.OrderDate+" không được trong quá khứ."));
 
                 // ✅ 2. Khởi tạo order
                 var order = new Order
                 {
                     Id = Guid.NewGuid(),
                     CustomerId = dto.CustomerId,
-                    OrderDate = _currentTime.GetVietnamTime(),
+                    OrderDate = dto.OrderDate,
                     Status = OrderStatus.Pending,
                     OrderDetails = new List<OrderDetail>()
                 };
@@ -62,12 +60,12 @@ namespace Services.Implementations
                 // ✅ 3. Duyệt từng dịch vụ
                 foreach (var item in dto.Services)
                 {
-                    if (item.ScheduledTime < _currentTime.GetVietnamTime())
-                        return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt dịch vụ có id "+item.ServiceId+" không được trong quá khứ."));
-
                     var service = await _serviceRepository.GetByIdAsync(item.ServiceId);
                     if (service == null || service.IsDeleted)
                         return ApiResult<OrderRespondDTO>.Failure(new Exception($"Dịch vụ với ID {item.ServiceId} không tồn tại."));
+
+                    if (item.ScheduledTime < _currentTime.GetVietnamTime())
+                        return ApiResult<OrderRespondDTO>.Failure(new Exception("Ngày đặt dịch vụ có tên " + service.Name + " không được trong quá khứ."));
 
                     var start = item.ScheduledTime;
                     var end = start.AddMinutes(service.Duration);
