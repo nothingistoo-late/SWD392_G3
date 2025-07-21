@@ -17,5 +17,7 @@ namespace Services.Interfaces
         Task<ApiResult<ServiceRespondDTO>> SoftDeleteServiceById(Guid serviceId);
         Task<ApiResult<List<ServiceRespondDTO>>> GetServicesByFilterAsync(ServiceFilterDTO filter);
 
+        Task<ApiResult<List<ServiceRatingResponseDTO>>> GetRatingsByServiceIdAsync(Guid serviceId);
+
     }
 }

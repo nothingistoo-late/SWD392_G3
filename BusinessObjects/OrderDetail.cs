@@ -13,7 +13,6 @@ namespace BusinessObjects
     {
         [Key]
         public Guid OrderDetailId { get; set; }
-
         public Guid ServiceId { get; set; }
         public virtual Service Service { get; set; } = null!;
 

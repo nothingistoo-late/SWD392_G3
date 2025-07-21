@@ -33,6 +33,16 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        //[HttpGet("service/{serviceId}")]
+        //public async Task<IActionResult> GetRatingsByServiceId(Guid serviceId)
+        //{
+        //    var result = await _serviceService.GetRatingsByServiceIdAsync(serviceId);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(result);
+        //    return Ok(result);
+        //}
+
+
         // GET: api/services
         [HttpGet]
         public async Task<IActionResult> GetAll()

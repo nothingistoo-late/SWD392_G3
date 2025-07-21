@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DTOs.ServiceDTO.Request;
 using DTOs.ServiceDTO.Respond;
+using Microsoft.EntityFrameworkCore;
+using Repositories.Implements;
 using Repositories.Interfaces;
 using Services.Commons;
 using System;
@@ -176,6 +178,34 @@ namespace Services.Implementations
             }
         }
 
+
+        public async Task<ApiResult<List<ServiceRatingResponseDTO>>> GetRatingsByServiceIdAsync(Guid serviceId)
+        {
+            try
+            {
+                var ratings = await _unitOfWork.RatingRepository.GetAllAsync(
+                    predicate: r => r.OrderDetail.ServiceId == serviceId,
+                    includes: r => new object[] { r.OrderDetail, r.OrderDetail.Staff }
+                );
+
+                var result =  ratings.Select(r => new ServiceRatingResponseDTO
+                {
+                    Score = r.Score,
+                    Comment = r.Comment,
+                    CreateDate = r.CreatedAt,
+                }).ToList();
+
+                if (result == null || !result.Any())
+                {
+                    return ApiResult<List<ServiceRatingResponseDTO>>.Failure(new Exception("Không tìm thấy đánh giá nào cho dịch vụ này."));
+                }
+                return ApiResult<List<ServiceRatingResponseDTO>>.Success(result, "Lấy đánh giá dịch vụ thành công!!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<ServiceRatingResponseDTO>>.Failure(new Exception("Lỗi khi lấy đánh giá dịch vụ: " + ex.Message));
+            }
+        }
 
     }
 }
