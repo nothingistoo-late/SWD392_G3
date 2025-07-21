@@ -222,7 +222,7 @@ namespace Repositories
                                 {
                                     Name = "Tắm gội toàn thân",
                                     Description = "Tắm gội nhẹ dịu dành cho chó/mèo, giúp sạch sẽ và thơm tho.",
-                                    Price = 150,
+                                    Price = 150000,
                                     Duration = 40,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -232,7 +232,7 @@ namespace Repositories
                                 {
                                     Name = "Cắt tỉa lông tạo kiểu",
                                     Description = "Cắt lông thẩm mỹ theo yêu cầu, phong cách dễ thương/chất chơi.",
-                                    Price = 250,
+                                    Price = 250000,
                                     Duration = 60,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -242,7 +242,7 @@ namespace Repositories
                                 {
                                     Name = "Vệ sinh tai",
                                     Description = "Làm sạch tai và kiểm tra các dấu hiệu viêm nhiễm.",
-                                    Price = 80,
+                                    Price = 80000,
                                     Duration = 15,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -252,7 +252,7 @@ namespace Repositories
                                 {
                                     Name = "Cạo lông sát mùa hè",
                                     Description = "Cạo lông ngắn giúp thú cưng mát mẻ hơn trong mùa nóng.",
-                                    Price = 180,
+                                    Price = 180000,
                                     Duration = 30,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -262,7 +262,7 @@ namespace Repositories
                                 {
                                     Name = "Cắt móng",
                                     Description = "Cắt móng gọn gàng, tránh thú cưng tự làm đau mình.",
-                                    Price = 50,
+                                    Price = 50000,
                                     Duration = 10,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -272,7 +272,7 @@ namespace Repositories
                                 {
                                     Name = "Massage thư giãn",
                                     Description = "Giúp thú cưng thư giãn, lưu thông máu tốt hơn.",
-                                    Price = 120,
+                                    Price = 120000,
                                     Duration = 25,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -282,7 +282,7 @@ namespace Repositories
                                 {
                                     Name = "Tẩy giun định kỳ",
                                     Description = "Tẩy giun an toàn cho thú cưng, khuyến nghị mỗi 3 tháng.",
-                                    Price = 90,
+                                    Price = 90000,
                                     Duration = 20,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -292,7 +292,7 @@ namespace Repositories
                                 {
                                     Name = "Tiêm phòng bệnh dại",
                                     Description = "Phòng bệnh dại bắt buộc với chó, áp dụng từ 3 tháng tuổi.",
-                                    Price = 200,
+                                    Price = 200000,
                                     Duration = 10,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -302,7 +302,7 @@ namespace Repositories
                                 {
                                     Name = "Tiêm phòng 7 bệnh",
                                     Description = "Tiêm phòng tổng hợp phòng ngừa nhiều bệnh nguy hiểm.",
-                                    Price = 350,
+                                    Price = 350000,
                                     Duration = 15,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -312,7 +312,7 @@ namespace Repositories
                                 {
                                     Name = "Chăm sóc hậu phẫu",
                                     Description = "Chăm sóc thú cưng sau khi triệt sản hoặc phẫu thuật nhỏ.",
-                                    Price = 300,
+                                    Price = 300000,
                                     Duration = 60,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -322,7 +322,7 @@ namespace Repositories
                                 {
                                     Name = "Spa xả stress",
                                     Description = "Gói combo massage, tắm thơm, sấy khô, chơi đùa.",
-                                    Price = 400,
+                                    Price = 400000,
                                     Duration = 90,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -332,7 +332,7 @@ namespace Repositories
                                 {
                                     Name = "Xét nghiệm máu cơ bản",
                                     Description = "Kiểm tra tình trạng máu, gan, thận, phát hiện bệnh sớm.",
-                                    Price = 320,
+                                    Price = 320000,
                                     Duration = 30,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -342,7 +342,7 @@ namespace Repositories
                                 {
                                     Name = "Khám sức khỏe định kỳ",
                                     Description = "Khám tổng quát, tư vấn dinh dưỡng, kiểm tra các chỉ số.",
-                                    Price = 250,
+                                    Price = 250000,
                                     Duration = 45,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -352,7 +352,7 @@ namespace Repositories
                                 {
                                     Name = "Gửi thú cưng qua đêm",
                                     Description = "Dịch vụ lưu trú 5 sao, có camera, ăn uống đúng giờ.",
-                                    Price = 500,
+                                    Price = 500000,
                                     Duration = 720,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -362,7 +362,7 @@ namespace Repositories
                                 {
                                     Name = "Huấn luyện cơ bản",
                                     Description = "Dạy thú cưng ngồi, nằm, bắt tay, đi vệ sinh đúng chỗ.",
-                                    Price = 600,
+                                    Price = 600000,
                                     Duration = 90,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -372,7 +372,7 @@ namespace Repositories
                                 {
                                     Name = "Tắm khử mùi siêu sạch",
                                     Description = "Tắm đặc biệt khử mùi cho chó/mèo nặng mùi.",
-                                    Price = 180,
+                                    Price = 180000,
                                     Duration = 40,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -382,7 +382,7 @@ namespace Repositories
                                 {
                                     Name = "Gắn chip định danh",
                                     Description = "Chip theo dõi + nhận diện chủ, chống thất lạc thú cưng.",
-                                    Price = 700,
+                                    Price = 700000,
                                     Duration = 15,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -392,7 +392,7 @@ namespace Repositories
                                 {
                                     Name = "Xét nghiệm ký sinh trùng",
                                     Description = "Phát hiện ký sinh trùng đường ruột, ngoài da,...",
-                                    Price = 300,
+                                    Price = 300000,
                                     Duration = 35,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -402,7 +402,7 @@ namespace Repositories
                                 {
                                     Name = "Chăm sóc răng miệng",
                                     Description = "Vệ sinh răng, loại bỏ cao răng, khử mùi hôi miệng.",
-                                    Price = 220,
+                                    Price = 220000,
                                     Duration = 30,
                                     CreatedAt = now,
                                     UpdatedAt = now,
@@ -412,7 +412,7 @@ namespace Repositories
                                 {
                                     Name = "Triệt sản chó/mèo",
                                     Description = "Phẫu thuật triệt sản an toàn, hồi phục nhanh.",
-                                    Price = 1200,
+                                    Price = 1200000,
                                     Duration = 180,
                                     CreatedAt = now,
                                     UpdatedAt = now,

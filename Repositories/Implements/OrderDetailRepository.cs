@@ -27,9 +27,11 @@ namespace Repositories.Implements
         {
             return await _dbSet.AnyAsync(od =>
                 od.StaffId == staffId &&
-                od.ScheduleTime < end &&      // Có lịch bắt đầu trước khi kết thúc lịch mới
-                end > od.ScheduleTime         // Và kết thúc sau khi lịch cũ bắt đầu
+                od.ScheduleTime.Date == start.Date && // ✅ Chỉ check lịch trong cùng một ngày
+                od.ScheduleTime < end &&
+                end > od.ScheduleTime
             );
         }
+
     }
 }

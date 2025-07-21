@@ -46,6 +46,7 @@ namespace Services.Implementations
                     Id = Guid.NewGuid(),
                     CustomerId = dto.CustomerId,
                     OrderDate = dto.OrderDate,
+                    Notes = dto.note,
                     Status = OrderStatus.Pending,
                     OrderDetails = new List<OrderDetail>()
                 };
@@ -81,7 +82,10 @@ namespace Services.Implementations
                     {
                         var isBusy = await _unitOfWork.OrderDetailRepository.IsStaffBusy(staff.Id, start, end);
                         var tempBusy = staffScheduleTracker.TryGetValue(staff.Id, out var slots)
-                                       && slots.Any(slot => slot.start < end && slot.end > start);
+                               && slots.Any(slot =>
+                                    slot.start.Date == start.Date &&
+                                    slot.start < end && slot.end > start);
+
                         var isWorking = await _unitOfWork.StaffScheduleRepository
                             .IsWithinWorkingHours(staff.Id, start, end); // ✅ Hàm check ca làm thực tế
 

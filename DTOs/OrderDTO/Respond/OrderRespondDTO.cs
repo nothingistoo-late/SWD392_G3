@@ -14,6 +14,7 @@ namespace DTOs.OrderDTO.Respond
         public Guid Id { get; set; }
         public Guid CustomerId { get; set; }
         public DateTime OrderDate { get; set; }
+        public OrderStatus status { get; set; }
         public decimal TotalPrice { get; set; }
         public List<OrderDetailRespondDTO> OrderDetails { get; set; } = new();
     }

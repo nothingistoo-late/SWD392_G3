@@ -15,6 +15,8 @@ namespace DTOs.OrderDTO.Request
         public Guid CustomerId { get; set; }
         [Required(ErrorMessage = "Cần phải nhập ngày order")]
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+        public string? note { get; set; }
+
         [Required(ErrorMessage = "Cần phải nhập ít nhất 1 service id")]
         public List<OrderServiceItemDTO> Services { get; set; }
     }
