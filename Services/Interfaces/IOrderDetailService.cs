@@ -8,9 +8,9 @@ namespace Services.Interfaces
 {
     public interface IOrderDetailService
     {
-        Task<ApiResult<bool>> MarkOrderDetailCompletedAsync(Guid orderDetailId);
+        Task<ApiResult<bool>> MarkOrderDetailCompletedAsync(Guid orderDetailId, string note);
         Task<ApiResult<bool>> CancelOrderDetailAsync(Guid orderDetailId);
         Task<ApiResult<bool>> RescheduleOrderDetailAsync(Guid orderDetailId, DateTime newTime);
-        Task<ApiResult<bool>> UpdateOrderDetailStatusAsync(Guid orderDetailId, OrderDetailStatus newStatus);
+        Task<ApiResult<bool>> UpdateOrderDetailStatusAsync(Guid orderDetailId, OrderDetailStatus newStatus, string? note);
     }
 }

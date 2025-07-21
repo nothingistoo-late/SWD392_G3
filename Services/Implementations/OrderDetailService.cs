@@ -14,9 +14,9 @@ namespace Services.Implementations
         {
         }
 
-        public async Task<ApiResult<bool>> MarkOrderDetailCompletedAsync(Guid orderDetailId)
+        public async Task<ApiResult<bool>> MarkOrderDetailCompletedAsync(Guid orderDetailId, string note)
         {
-            return await UpdateOrderDetailStatusAsync(orderDetailId, OrderDetailStatus.Completed);
+            return await UpdateOrderDetailStatusAsync(orderDetailId, OrderDetailStatus.Completed, note);
         }
 
         public async Task<ApiResult<bool>> CancelOrderDetailAsync(Guid orderDetailId)
@@ -24,7 +24,7 @@ namespace Services.Implementations
             return await UpdateOrderDetailStatusAsync(orderDetailId, OrderDetailStatus.Cancelled);
         }
 
-        public async Task<ApiResult<bool>> UpdateOrderDetailStatusAsync(Guid orderDetailId, OrderDetailStatus newStatus)
+        public async Task<ApiResult<bool>> UpdateOrderDetailStatusAsync(Guid orderDetailId, OrderDetailStatus newStatus, string? note = null)
         {
             try
             {
@@ -33,6 +33,7 @@ namespace Services.Implementations
                     return ApiResult<bool>.Failure(new Exception("Không tìm thấy chi tiết đơn hàng hoặc đã bị xoá."));
 
                 detail.Status = newStatus;
+                detail.Note = note;
                 await _unitOfWork.SaveChangesAsync();
                 return ApiResult<bool>.Success(true, $"Cập nhật trạng thái thành công: {newStatus}");
             }
