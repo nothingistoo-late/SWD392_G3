@@ -62,10 +62,16 @@ namespace Repositories.Implements
                     .ThenInclude(c => c.User)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Service)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Rating)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Staff)              // 💥 ADD
+                        .ThenInclude(s => s.User)             // 💥 ADD
                 .OrderByDescending(o => o.CreatedAt)
                 .Where(o => o.CustomerId == customerid)
                 .ToListAsync();
         }
+
 
     }
 }

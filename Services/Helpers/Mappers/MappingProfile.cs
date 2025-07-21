@@ -29,6 +29,8 @@ namespace Services.Helpers.Mappers
 
             // OrderDetail -> OrderDetailRespondDTO
             CreateMap<OrderDetail, OrderDetailRespondDTO>()
+                    .ForMember(dest => dest.Rating,
+                               opt => opt.MapFrom(src => src.Rating))
                     .ForMember(dest => dest.Id,
                                opt => opt.MapFrom(src => src.OrderDetailId))
                     .ForMember(dest => dest.ServiceName,
