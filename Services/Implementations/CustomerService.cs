@@ -224,7 +224,7 @@ namespace Services.Implementations
                     user.LastName = request.LastName;
 
                 if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-                    user.LastName = request.PhoneNumber;
+                    user.PhoneNumber = request.PhoneNumber;
 
                 if (request.Gender.HasValue)
                     user.Gender = request.Gender.Value.ToString(); // ví dụ "Male"

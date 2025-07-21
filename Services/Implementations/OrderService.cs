@@ -380,7 +380,6 @@ namespace Services.Implementations
             try
             {
                 var orders = await _orderRepository.GetAllWithCustomerIdAndServiceAsync(customerId);
-
                 if (orders == null || !orders.Any())
                     return ApiResult<List<OrderRespondDTO>>.Failure(new Exception("Không tìm thấy đơn hàng cho khách hàng này!"));
                 var result = _mapper.Map<List<OrderRespondDTO>>(orders);

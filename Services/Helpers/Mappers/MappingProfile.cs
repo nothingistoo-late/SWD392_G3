@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DTOs;
 using DTOs.Customer.Responds;
+using DTOs.MemberShip.Request;
+using DTOs.MemberShip.Respond;
 using DTOs.OrderDTO.Respond;
 using DTOs.ServiceDTO.Request;
 using DTOs.ServiceDTO.Respond;
@@ -21,6 +23,8 @@ namespace Services.Helpers.Mappers
             // Service mappings
             CreateMap<Service, AddServiceRequestDTO>().ReverseMap();
             CreateMap<Service, ServiceRespondDTO>().ReverseMap();
+            CreateMap<Membership, MembershipResponse>().ReverseMap();
+            CreateMap<CreateMembershipRequest, Membership>().ReverseMap();
 
             // OrderDetail -> OrderDetailRespondDTO
             CreateMap<OrderDetail, OrderDetailRespondDTO>()

@@ -11,10 +11,10 @@ namespace DTOs.MemberShip.Request
     {
         public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }
+        public decimal DiscountPercentage { get; set; } // 💥 Giảm bao nhiêu % khi mua hàng
         public string Description { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
         public int DurationInDays { get; set; }
-        public double DiscountRate { get; set; } // ví dụ 0.1 là 10%
     }
 
 
