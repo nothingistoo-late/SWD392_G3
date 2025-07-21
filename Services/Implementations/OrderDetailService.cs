@@ -28,7 +28,7 @@ namespace Services.Implementations
         {
             try
             {
-                var detail = await _unitOfWork.OrderDetailRepository.GetByIdAsync(orderDetailId);
+                var detail = await _unitOfWork.OrderDetailRepository.FirstOrDefaultAsync(o=>o.OrderDetailId== orderDetailId);
                 if (detail == null || detail.IsDeleted)
                     return ApiResult<bool>.Failure(new Exception("Không tìm thấy chi tiết đơn hàng hoặc đã bị xoá."));
 
@@ -47,7 +47,7 @@ namespace Services.Implementations
         {
             try
             {
-                var detail = await _unitOfWork.OrderDetailRepository.GetByIdAsync(orderDetailId);
+                var detail = await _unitOfWork.OrderDetailRepository.FirstOrDefaultAsync(o=> o.OrderDetailId== orderDetailId);
                 if (detail == null || detail.IsDeleted)
                     return ApiResult<bool>.Failure(new Exception("Không tìm thấy chi tiết đơn hàng hoặc đã bị xoá."));
 
