@@ -20,6 +20,7 @@ namespace DTOs.OrderDTO.Respond
 
     public class OrderDetailRespondDTO
     {
+        public Guid Id { get; set; }
         public Guid ServiceId { get; set; }
         public string ServiceName { get; set; } = default!;
         public OrderDetailStatus Status { get; set; } 
