@@ -117,6 +117,7 @@ namespace WebAPI.Extensions
             services.AddScoped<IStaffScheduleService, StaffScheduleService>();
             services.AddScoped<IOrderDetailService, OrderDetailService>();
             services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IVietQRService, VietQRService>();
 
             // 5. Email + Quartz
             services.AddEmailServices(opts =>
