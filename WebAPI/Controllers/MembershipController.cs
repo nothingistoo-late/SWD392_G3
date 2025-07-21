@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] CreateMembershipRequest dto)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateMembershipRequest dto)
         {
             var result = await _membershipService.UpdateAsync(id, dto);
             if (result.IsSuccess)

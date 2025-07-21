@@ -20,8 +20,6 @@ namespace BusinessObjects
 
         public DateTime StartDate { get; set; }
 
-        public int DurationInDays { get; set; } // 👈 Thêm chỗ này
-
         public DateTime? EndDate { get; set; } // null nếu đang dùng
     }
 

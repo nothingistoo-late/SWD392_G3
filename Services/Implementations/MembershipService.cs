@@ -161,7 +161,7 @@ namespace Services.Implementations
         }
 
 
-        public async Task<ApiResult<MembershipResponse>> UpdateAsync(Guid id, CreateMembershipRequest dto)
+        public async Task<ApiResult<MembershipResponse>> UpdateAsync(Guid id, UpdateMembershipRequest dto)
         {
             if (dto == null)
                 return ApiResult<MembershipResponse>.Failure(new Exception("Dữ liệu cập nhật không hợp lệ."));
@@ -177,11 +177,28 @@ namespace Services.Implementations
                     return ApiResult<MembershipResponse>.Failure(new Exception("Không tìm thấy Membership để cập nhật."));
                 }
 
-                // Cập nhật thông tin
-                _mapper.Map(dto, entity); // Map trực tiếp từ dto sang entity
+                // Update từng trường nếu dto có giá trị
+                if (!string.IsNullOrWhiteSpace(dto.Name))
+                    entity.Name = dto.Name;
+
+                if (dto.Price.HasValue)
+                    entity.Price = dto.Price.Value;
+
+                if (dto.DiscountPercentage.HasValue)
+                    entity.DiscountPercentage = dto.DiscountPercentage.Value;
+
+                if (!string.IsNullOrWhiteSpace(dto.Description))
+                    entity.Description = dto.Description;
+
+                if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
+                    entity.ImageUrl = dto.ImageUrl;
+
+                if (dto.DurationInDays.HasValue)
+                    entity.DurationInDays = dto.DurationInDays.Value;
+
+                // Update
                 await _repository.UpdateAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
-
                 await transaction.CommitAsync();
 
                 var response = _mapper.Map<MembershipResponse>(entity);
@@ -193,6 +210,7 @@ namespace Services.Implementations
                 return ApiResult<MembershipResponse>.Failure(new Exception("Lỗi khi cập nhật Membership: " + ex.Message));
             }
         }
+
 
     }
 }

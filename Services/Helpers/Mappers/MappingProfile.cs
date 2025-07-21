@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DTOs;
 using DTOs.Customer.Responds;
+using DTOs.CustomerMembership.Respond;
 using DTOs.MemberShip.Request;
 using DTOs.MemberShip.Respond;
 using DTOs.OrderDTO.Respond;
@@ -75,6 +76,10 @@ namespace Services.Helpers.Mappers
           .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
           .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender)).ReverseMap();
+
+            CreateMap<CustomerMembership, CustomerMembershipResponse>()
+            .ForMember(dest => dest.MembershipName, opt => opt.MapFrom(src => src.Membership.Name));
+
 
         }
     }

@@ -13,7 +13,7 @@ namespace Services.Interfaces
         Task<ApiResult<List<MembershipResponse>>> GetAllAsync();
         Task<ApiResult<MembershipResponse>> GetByIdAsync(Guid id);
         Task<ApiResult<List<MembershipResponse>>> CreateRangeAsync(List<CreateMembershipRequest> dtos);
-        Task<ApiResult<MembershipResponse>> UpdateAsync(Guid id, CreateMembershipRequest dto);
+        Task<ApiResult<MembershipResponse>> UpdateAsync(Guid id, UpdateMembershipRequest dto);
         Task<ApiResult<List<MembershipDeleteResultDTO>>> DeleteAsync(List<Guid> ids);
     }
 }

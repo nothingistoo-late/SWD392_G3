@@ -14,7 +14,9 @@ namespace Repositories.WorkSeeds.Interfaces
         IServiceRepository ServiceRepository { get; }
         IStaffRepository StaffRepository { get; }
         IStaffScheduleRepository StaffScheduleRepository { get; }
-
         IRatingRepository RatingRepository { get; }
+        IMembershipRepository MembershipRepository { get; }
+
+        ICustomerMemberShipRepository CustomerMemberShipRepository { get; }
     }
 }
