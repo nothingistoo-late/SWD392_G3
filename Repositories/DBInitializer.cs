@@ -214,7 +214,7 @@ namespace Repositories
             if (!context.Services.Any())
             {
                 var now = DateTime.UtcNow.AddHours(7);
-                var defaultImg = "https://example.com/default-service.jpg";
+                var defaultImg = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzDPMHdH3nHA9rsDDo3TfQKmDJCvlcxH209A&s";
 
                 var services = new List<Service>
                             {
@@ -226,7 +226,7 @@ namespace Repositories
                                     Duration = 40,
                                     CreatedAt = now,
                                     UpdatedAt = now,
-                                    imgURL = "https://example.com/tam-goi-toan-than.jpg"
+                                    imgURL = defaultImg
                                 },
                                 new()
                                 {
