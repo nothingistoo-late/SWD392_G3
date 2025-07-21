@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace DTOs.OrderDetailDTO.Request
 {
-    public class UpdateOrderDetailStatusRequestDTO
-    {
-        public OrderDetailStatus NewStatus { get; set; }
-    }
+    public class UpdateOrderDetailStatusAndNoteRequestDTO
+	{
+		public Guid OrderDetailId { get; set; }
+		public OrderDetailStatus NewStatus { get; set; }
+		public string? Note { get; set; }
+	}
 
 }

@@ -1,4 +1,5 @@
-﻿using Repositories.Interfaces;
+﻿using DTOs.OrderDetailDTO.Request;
+using Repositories.Interfaces;
 using Services.Commons;
 using System;
 using System.Collections.Generic;
@@ -14,34 +15,72 @@ namespace Services.Implementations
         {
         }
 
-        public async Task<ApiResult<bool>> MarkOrderDetailCompletedAsync(Guid orderDetailId, string note)
+        public async Task<ApiResult<bool>> MarkOrderDetailCompletedAsync(Guid orderDetailId, string? note)
         {
-            return await UpdateOrderDetailStatusAsync(orderDetailId, OrderDetailStatus.Completed, note);
+            var dto = new UpdateOrderDetailStatusAndNoteRequestDTO
+            {
+                OrderDetailId = orderDetailId,
+                NewStatus = OrderDetailStatus.Completed,
+                Note = note
+            };
+
+            return await UpdateOrderDetailStatusAsync(dto);
         }
 
-        public async Task<ApiResult<bool>> CancelOrderDetailAsync(Guid orderDetailId)
+
+        public async Task<ApiResult<bool>> CancelOrderDetailAsync(Guid orderDetailId, string? note)
         {
-            return await UpdateOrderDetailStatusAsync(orderDetailId, OrderDetailStatus.Cancelled);
+            var dto = new UpdateOrderDetailStatusAndNoteRequestDTO
+            {
+                OrderDetailId = orderDetailId,
+                NewStatus = OrderDetailStatus.Cancelled,
+                Note = note
+            };
+
+            return await UpdateOrderDetailStatusAsync(dto);
         }
 
-        public async Task<ApiResult<bool>> UpdateOrderDetailStatusAsync(Guid orderDetailId, OrderDetailStatus newStatus, string? note = null)
+
+        public async Task<ApiResult<bool>> UpdateOrderDetailStatusAsync(UpdateOrderDetailStatusAndNoteRequestDTO dto)
         {
             try
             {
-                var detail = await _unitOfWork.OrderDetailRepository.FirstOrDefaultAsync(o=>o.OrderDetailId== orderDetailId);
+                var detail = await _unitOfWork.OrderDetailRepository
+                    .FirstOrDefaultAsync(o => o.OrderDetailId == dto.OrderDetailId);
+
                 if (detail == null || detail.IsDeleted)
                     return ApiResult<bool>.Failure(new Exception("Không tìm thấy chi tiết đơn hàng hoặc đã bị xoá."));
 
-                detail.Status = newStatus;
-                detail.Note = note;
+                // Cập nhật trạng thái + ghi chú
+                detail.Status = dto.NewStatus;
+                detail.Note = dto.Note;
+
+                // Lấy toàn bộ các order detail thuộc cùng order
+                var allDetails = await _unitOfWork.OrderDetailRepository
+                    .GetAllAsync(o => o.OrderId == detail.OrderId && !o.IsDeleted);
+
+                // Tìm status nhỏ nhất
+                var minStatus = allDetails.Min(d => (int)d.Status);
+
+                // Cập nhật trạng thái order cha
+                var order = await _unitOfWork.OrderRepository
+                    .FirstOrDefaultAsync(o => o.Id == detail.OrderId);
+
+                if (order != null)
+                {
+                    order.Status = (OrderStatus)minStatus;
+                }
+
                 await _unitOfWork.SaveChangesAsync();
-                return ApiResult<bool>.Success(true, $"Cập nhật trạng thái thành công: {newStatus}");
+                return ApiResult<bool>.Success(true, $"Cập nhật trạng thái thành công: {dto.NewStatus}");
             }
             catch (Exception ex)
             {
                 return ApiResult<bool>.Failure(new Exception("Lỗi khi cập nhật trạng thái: " + ex.Message));
             }
         }
+
+
 
         public async Task<ApiResult<bool>> RescheduleOrderDetailAsync(Guid orderDetailId, DateTime newTime)
         {
@@ -52,7 +91,7 @@ namespace Services.Implementations
                     return ApiResult<bool>.Failure(new Exception("Không tìm thấy chi tiết đơn hàng hoặc đã bị xoá."));
 
                 detail.ScheduleTime = newTime;
-                detail.Status = OrderDetailStatus.Confirmed; // Đổi lịch → xem như đã xác nhận lại
+                detail.Status = OrderDetailStatus.Pending; // Đổi lịch → xem như đã xác nhận lại
                 await _unitOfWork.SaveChangesAsync();
                 return ApiResult<bool>.Success(true, "Đổi lịch thành công.");
             }

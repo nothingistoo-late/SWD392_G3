@@ -15,4 +15,8 @@
     <Folder Include="OrderDetailDTO\Respond\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="OrderDetailDTO\Request\UpdateOrderDetailStatusAndNoteRequestDTO.cs" />
+  </ItemGroup>
+
 </Project>

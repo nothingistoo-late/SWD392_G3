@@ -15,16 +15,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpPatch("{orderDetailId}/complete")]
-        public async Task<IActionResult> MarkCompleted(Guid orderDetailId, string? note)
+        public async Task<IActionResult> MarkCompleted(Guid orderDetailId, [FromBody] string? note)
         {
             var result = await _orderDetailService.MarkOrderDetailCompletedAsync(orderDetailId, note);
             return Ok(result);
         }
-
         [HttpPatch("{orderDetailId}/cancel")]
-        public async Task<IActionResult> Cancel(Guid orderDetailId)
+        public async Task<IActionResult> Cancel(Guid orderDetailId, [FromBody] string? note)
         {
-            var result = await _orderDetailService.CancelOrderDetailAsync(orderDetailId);
+            var result = await _orderDetailService.CancelOrderDetailAsync(orderDetailId, note);
             return Ok(result);
         }
 
@@ -35,10 +34,10 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPatch("{orderDetailId}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid orderDetailId, [FromBody] UpdateOrderDetailStatusRequestDTO dto, string? note)
+        [HttpPatch("status")]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateOrderDetailStatusAndNoteRequestDTO dto)
         {
-            var result = await _orderDetailService.UpdateOrderDetailStatusAsync(orderDetailId, dto.NewStatus, note);
+            var result = await _orderDetailService.UpdateOrderDetailStatusAsync(dto);
             return Ok(result);
         }
 
