@@ -163,7 +163,7 @@ namespace Services.Implementations
         {
             try
             {
-                var customer = await _repository.GetByIdAsync(customerId, c => c.User);
+                var customer = await _repository.FirstOrDefaultAsync(c => c.UserId == customerId);
                 if (customer == null || customer.IsDeleted)
                     return ApiResult<CustomerRespondDTO>.Failure(new Exception("Không tìm thấy khách hàng để xóa!"));
 

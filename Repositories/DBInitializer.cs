@@ -23,7 +23,7 @@ namespace Repositories
                         Description = "Gói miễn phí cơ bản dành cho khách mới.",
                         DurationInDays = 0,
                         DiscountPercentage = 0,
-                        ImageUrl = "https://example.com/membership-basic.png",
+                        ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzDPMHdH3nHA9rsDDo3TfQKmDJCvlcxH209A&s",
                         CreatedAt = DateTime.UtcNow
                     },
                     new Membership
@@ -33,7 +33,7 @@ namespace Repositories
                         Description = "Giảm giá nhẹ nhàng cho các đơn hàng nhỏ.",
                         DurationInDays = 30,
                         DiscountPercentage = 5,
-                        ImageUrl = "https://example.com/membership-bronze.png",
+                        ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzDPMHdH3nHA9rsDDo3TfQKmDJCvlcxH209A&s",
                         CreatedAt = DateTime.UtcNow
                     },
                     new Membership
@@ -43,7 +43,7 @@ namespace Repositories
                         Description = "Ưu đãi ổn định cho khách thường xuyên.",
                         DurationInDays = 60,
                         DiscountPercentage = 10,
-                        ImageUrl = "https://example.com/membership-silver.png",
+                        ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzDPMHdH3nHA9rsDDo3TfQKmDJCvlcxH209A&s",
                         CreatedAt = DateTime.UtcNow
                     },
                     new Membership
@@ -53,7 +53,7 @@ namespace Repositories
                         Description = "Giảm mạnh tay cho đơn hàng lớn và combo.",
                         DurationInDays = 90,
                         DiscountPercentage = 15,
-                        ImageUrl = "https://example.com/membership-gold.png",
+                        ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzDPMHdH3nHA9rsDDo3TfQKmDJCvlcxH209A&s",
                         CreatedAt = DateTime.UtcNow
                     },
                     new Membership
@@ -63,7 +63,7 @@ namespace Repositories
                         Description = "Tối đa hóa lợi ích cho khách VIP.",
                         DurationInDays = 180,
                         DiscountPercentage = 20,
-                        ImageUrl = "https://example.com/membership-platinum.png",
+                        ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzDPMHdH3nHA9rsDDo3TfQKmDJCvlcxH209A&s",
                         CreatedAt = DateTime.UtcNow
                     }
                 };
