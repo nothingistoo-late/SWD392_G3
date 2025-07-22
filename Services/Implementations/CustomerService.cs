@@ -44,15 +44,16 @@ namespace Services.Implementations
                 {
                     await _unitOfWork.RollbackTransactionAsync();
                     return ApiResult<CreateCustomerRequestDTO>.Failure(new Exception("Tạo user thất bại: " + string.Join(", ", createUserResult.Errors.Select(e => e.Description))));
-                }
+                } else 
+                    await _userManager.AddToRoleAsync(user, "USER"); // Thêm vào role Customer
 
                 // Bước 2: Tạo Customer
                 var customer = new Customer
-                {
-                    UserId = user.Id,
-                    Address = dto.Address
+                    {
+                        UserId = user.Id,
+                        Address = dto.Address
 
-                };
+                    };
 
                 await _repository.AddAsync(customer);
                 await _unitOfWork.SaveChangesAsync();
