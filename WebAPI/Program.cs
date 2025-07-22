@@ -1,9 +1,12 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using SWP391.KoiCareSystemAtHome.Service.Services;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // 1) Đăng ký toàn bộ hạ tầng + controllers
 builder.Services
       .AddInfrastructure(builder.Configuration)
       .AddSwaggerServices();
+builder.Services.AddScoped<VnPayService>();
 
 var app = builder.Build();
 
