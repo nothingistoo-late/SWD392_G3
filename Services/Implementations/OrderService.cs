@@ -128,6 +128,7 @@ namespace Services.Implementations
                     return ApiResult<OrderRespondDTO>.Failure(new Exception("Không thể load lại đơn hàng sau khi tạo."));
 
                 var response = _mapper.Map<OrderRespondDTO>(fullOrder);
+
                 return ApiResult<OrderRespondDTO>.Success(response, "Tạo order thành công!!");
             }
             catch (Exception ex)
@@ -394,6 +395,36 @@ namespace Services.Implementations
                 return ApiResult<List<OrderRespondDTO>>.Failure(new Exception("Lỗi khi lấy danh sách đơn hàng: " + ex.Message));
             }
         }
+
+        public async Task<ApiResult<bool>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequestDTO newStatus)
+        {
+            try
+            {
+                if (!Enum.IsDefined(typeof(OrderStatus), newStatus.Status))
+                {
+                    return ApiResult<bool>.Failure(new Exception("Invalid order status value!"));
+                }
+
+                var order = await _unitOfWork.OrderRepository.FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                    return ApiResult<bool>.Failure(new Exception("Order not found!"));
+
+                // Update status
+                order.Status = newStatus.Status;
+
+                await _unitOfWork.OrderRepository.UpdateAsync(order);
+                await _unitOfWork.SaveChangesAsync();
+
+                return ApiResult<bool>.Success(true, "Order status updated successfully!");
+            }
+            catch (Exception ex)
+            {
+                // Log nếu có hệ thống log
+                return ApiResult<bool>.Failure(new Exception($"Error while updating order status: {ex.Message}"));
+            }
+        }
+
 
     }
 }

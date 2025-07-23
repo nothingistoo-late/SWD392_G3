@@ -1,4 +1,6 @@
-﻿using DTOs.VnPay.Request;
+﻿using BusinessObjects.Common;
+using DTOs.OrderDTO.Request;
+using DTOs.VnPay.Request;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SWP391.KoiCareSystemAtHome.Service.Services;
@@ -10,10 +12,15 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly VnPayService _vpnPayService;
+        private readonly IOrderService _orderService;
+        private readonly ICustomerMembershipService _customerMemberShipService;
 
-        public PaymentController(VnPayService vpnPayService)
+
+        public PaymentController(ICustomerMembershipService customerMembershipService, IOrderService order ,VnPayService vpnPayService)
         {
             _vpnPayService = vpnPayService;
+            _orderService = order;
+            _customerMemberShipService = customerMembershipService;
         }
 
         //[HttpGet("getPaymentByAdvId/{advId}")]
@@ -89,11 +96,24 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
         public async Task<ActionResult> CreatePaymentURL(PaymentRequestModel request)
         {
 
+            var order = await _orderService.GetOrderByIdAsync(request.OrderId);
+            if (!order.IsSuccess)
+            {
+                return NotFound("Order not found");
+            }
+
+            var customerMembership = await _customerMemberShipService.GetBestActiveMembershipByCustomerAsync(order.Data.CustomerId);
+            decimal amout = 0;
+            if (!customerMembership.IsSuccess)
+                amout = order.Data.TotalPrice;
+            else
+                amout = order.Data.TotalPrice * (1 - customerMembership.Data.DiscountPercentage / 100m);
+
+
             PaymentInformationModel model = new()
             {
-                Amount = request.Amount,
-                OrderDescription = request.OrderDescription,
-                OrderId = request.OrderId
+                OrderId = order.Data.Id,
+                Amount = amout 
             };
 
             string url = _vpnPayService.CreatePaymentUrl(model, HttpContext);
@@ -112,18 +132,18 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
             {
                 var response = _vpnPayService.PaymentExecute(Request.Query);
 
-                string[] splitDescription = response.OrderDescription.Split(" ");
+                //string[] splitDescription = response.OrderDescription.Split(" ");
 
-                var paymentModel = new PaymentModel
-                {
-                    PackageId = int.Parse(splitDescription[1]),
-                    PostId = int.Parse(splitDescription[0]),
-                    Description = response.OrderDescription,
-                    PayDate = DateTime.Now,
-                    TransactionId = int.Parse(response.TransactionId),
-                    Success = response.Success,
-                    Token = response.Token,
-                };
+                //var paymentModel = new PaymentModel
+                //{
+                //    PackageId = int.Parse(splitDescription[1]),
+                //    PostId = int.Parse(splitDescription[0]),
+                //    Description = response.OrderDescription,
+                //    PayDate = DateTime.Now,
+                //    TransactionId = int.Parse(response.TransactionId),
+                //    Success = response.Success,
+                //    Token = response.Token,
+                //};
 
                 //var advModel = new UpdateAdsModel
                 //{
@@ -135,17 +155,29 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
                 //bool success = false;
 
                 //Console.WriteLine(paymentModel.PackageId + " " + paymentModel.PostId );
+                var vnpTxnRef = Request.Query["vnp_OrderInfo"];
+
+                var order = await _orderService.GetOrderByIdAsync(Guid.Parse(vnpTxnRef));
 
                 if (response.Success && response.TransactionId != "0")
                 {
                     //success = await _paymentService.CreatePaymentAsync(paymentModel);
                     //await _paymentService.CreatePaymentAsync(paymentModel);
                     //await _advService.UpdateAdsPaymentAsync(advModel);
-                    return Redirect("http://localhost:5173/SuccessPage");
+                    var status = new UpdateOrderStatusRequestDTO
+                    {
+                        Status = OrderStatus.Paid
+                    };
+
+                    await _orderService.UpdateOrderStatusAsync(order.Data.Id, status);
+
+                    //_orderService.UpdateOrderAsync
+
+                    return Ok("Ditme mình thành tỷ phú rồi đại vương ơi!!");
                 }
 
                 //return Ok(response);
-                return Redirect("http://localhost:5173/FailurePage");
+                return Ok("Ditme tiền giả rồi đại vương ơi!!");
             }
             catch (Exception ex)
             {

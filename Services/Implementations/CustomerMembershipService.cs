@@ -155,7 +155,36 @@ namespace Services.Implementations
                 return ApiResult<List<CustomerMembershipResponse>>.Failure(new Exception("Lỗi khi lấy danh sách membership của khách hàng."));
             }
         }
+        public async Task<ApiResult<CustomerMembershipResponse>> GetBestActiveMembershipByCustomerAsync(Guid customerId)
+        {
+            try
+            {
+                var customerExists = await _unitOfWork.CustomerRepository
+                    .AnyAsync(o => o.UserId == customerId);
 
+                if (!customerExists)
+                    return ApiResult<CustomerMembershipResponse>.Failure(new Exception("Không tìm thấy khách hàng."));
+
+                var bestMembership = await _unitOfWork.CustomerMemberShipRepository
+                    .GetQueryable()
+                    .Where(x => x.CustomerId == customerId &&(
+                                x.EndDate > DateTime.Now || x.EndDate==null)&&
+                                x.Membership.IsDeleted == false)
+                    .Include(x => x.Membership)
+                    .OrderByDescending(x => x.Membership.Price)  // Nếu trùng Level thì lấy cái đắt hơn
+                    .FirstOrDefaultAsync();
+
+                if (bestMembership == null)
+                    return ApiResult<CustomerMembershipResponse>.Failure(new Exception("Không có membership nào đang hoạt động."));
+
+                var result = _mapper.Map<CustomerMembershipResponse>(bestMembership);
+                return ApiResult<CustomerMembershipResponse>.Success(result, "Lấy membership VIP nhất còn hoạt động thành công!");
+            }
+            catch (Exception)
+            {
+                return ApiResult<CustomerMembershipResponse>.Failure(new Exception("Lỗi khi lấy membership VIP."));
+            }
+        }
 
     }
 }

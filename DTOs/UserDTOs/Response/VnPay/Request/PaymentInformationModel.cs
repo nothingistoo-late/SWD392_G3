@@ -10,7 +10,6 @@ namespace DTOs.VnPay.Request
     {
         public Guid OrderId { get; set; }
         public decimal Amount { get; set; }
-        public string OrderDescription { get; set; }
     }
 
     public class VNPaymentResponseModel
@@ -28,9 +27,6 @@ namespace DTOs.VnPay.Request
     public class PaymentRequestModel
     {
         public Guid OrderId { get; set; }
-        public string OrderDescription { get; set; }
-
-        public Decimal Amount { get; set; }
     }
 
     public partial class PaymentModel
