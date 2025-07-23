@@ -19,7 +19,8 @@
         Pending,
         Processing,
         Done,
-        Cancelled
+        Cancelled,
+        Paid
     }
 
     public enum OrderDetailStatus

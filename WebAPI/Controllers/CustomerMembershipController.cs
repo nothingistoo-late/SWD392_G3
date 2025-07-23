@@ -48,6 +48,14 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+        [HttpGet("by-customer/best{customerId}")]
+        public async Task<IActionResult> GetBestMembershipsByCustomer(Guid customerId)
+        {
+            var result = await _service.GetBestActiveMembershipByCustomerAsync(customerId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
 
     }
 }

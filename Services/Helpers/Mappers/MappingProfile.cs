@@ -82,7 +82,9 @@ namespace Services.Helpers.Mappers
           .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender)).ReverseMap();
 
             CreateMap<CustomerMembership, CustomerMembershipResponse>()
-            .ForMember(dest => dest.MembershipName, opt => opt.MapFrom(src => src.Membership.Name));
+            .ForMember(dest => dest.MembershipName, opt => opt.MapFrom(src => src.Membership.Name))
+            .ForMember(dest => dest.DiscountPercentage, opt => opt.MapFrom(src => src.Membership.DiscountPercentage));
+            ;
 
 
         }

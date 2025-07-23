@@ -11,7 +11,7 @@ namespace BusinessObjects
     {
         [Key]
         public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
+        public string Name { get; set; } = null!; //MEMBERSHIP
         public double Price { get; set; }
         public string Description { get; set; } = null!;
         public int Duration { get; set; } // Duration in minutes

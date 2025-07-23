@@ -82,7 +82,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetOrdersByStaffId(Guid staffId)
         {
             var result = await _orderService.GetOrdersByStaffIdAsync(staffId);
-            return Ok(result); 
+            return Ok(result);
         }
 
         [HttpGet("customer/{customerId}")]
@@ -92,5 +92,12 @@ namespace WebAPI.Controllers
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
+        [HttpPatch("{orderId}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(Guid orderId, [FromBody] UpdateOrderStatusRequestDTO newStatus)
+        {
+            var result = await _orderService.UpdateOrderStatusAsync(orderId, newStatus);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+
+        }
     }
 }

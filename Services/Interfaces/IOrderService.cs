@@ -19,6 +19,8 @@ namespace Services.Interfaces
         Task<ApiResult<OrderRespondDTO>> SoftDeleteOrderById(Guid orderId);
         Task<ApiResult<List<OrderRespondDTO>>> GetOrdersByStaffIdAsync(Guid staffId);
         Task<ApiResult<List<OrderRespondDTO>>> GetAllOrdersByCustomerIdAsync(Guid customerId);
+        Task<ApiResult<bool>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequestDTO newStatus);
+
 
     }
 }
