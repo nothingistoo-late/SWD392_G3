@@ -42,6 +42,8 @@ namespace Services.Helpers.Mappers
 
             // 💥 ADD THIS: Order -> OrderRespondDTO
             CreateMap<Order, OrderRespondDTO>();
+            CreateMap<Order, OrderResponse>();
+
 
             // Customer -> CreateCustomerRequestDTO
             CreateMap<CreateCustomerRequestDTO, User>()

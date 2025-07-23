@@ -20,7 +20,7 @@ namespace BusinessObjects
 
         public DateTime StartDate { get; set; }
 
-        public DateTime? EndDate { get; set; } // null nếu đang dùng
+        public DateTime? EndDate { get; set; } = null; // null nếu đang dùng
     }
 
 }

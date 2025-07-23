@@ -35,7 +35,7 @@ namespace SWP391.KoiCareSystemAtHome.Service.Services
             pay.AddRequestData("vnp_CurrCode", _configuration["Vnpay:CurrCode"]);
             pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
             pay.AddRequestData("vnp_Locale", _configuration["Vnpay:Locale"]);
-            pay.AddRequestData("vnp_OrderInfo", $"{model.OrderId}");
+            pay.AddRequestData("vnp_OrderInfo", $"{model.OrderId} {model.OrderType}");
             pay.AddRequestData("vnp_OrderType", "other");
             pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
             pay.AddRequestData("vnp_TxnRef", tick);
@@ -53,5 +53,7 @@ namespace SWP391.KoiCareSystemAtHome.Service.Services
 
             return response;
         }
+
+
     }
 }

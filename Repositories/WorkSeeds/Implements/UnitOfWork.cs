@@ -21,6 +21,7 @@ namespace Repositories.WorkSeeds.Implements
         private IRatingRepository _ratingRepository;
         private IMembershipRepository _MembershipRepositorysitory;
         private ICustomerMemberShipRepository _customerMemberShipRepository;
+        private IOrderMembershipRepository _orderMembershipRepository;
         public UnitOfWork(SWD392_G3DBcontext context, IRepositoryFactory repositoryFactory)
         {
             _context = context;
@@ -50,7 +51,8 @@ namespace Repositories.WorkSeeds.Implements
             _MembershipRepositorysitory ??= _repositoryFactory.GetCustomRepository<IMembershipRepository>();
         public ICustomerMemberShipRepository CustomerMemberShipRepository => 
             _customerMemberShipRepository ??= _repositoryFactory.GetCustomRepository<ICustomerMemberShipRepository>();
-
+        public IOrderMembershipRepository OrderMembershipRepository =>
+            _orderMembershipRepository ??= _repositoryFactory.GetCustomRepository<IOrderMembershipRepository>();
         public IGenericRepository<TEntity, TKey> GetRepository<TEntity, TKey>()
             where TEntity : class
         {

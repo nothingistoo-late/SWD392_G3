@@ -47,6 +47,7 @@ namespace Services.Implementations
                     CustomerId = dto.CustomerId,
                     OrderDate = dto.OrderDate,
                     Notes = dto.note,
+                    Type = OrderType.Service,
                     Status = OrderStatus.Pending,
                     OrderDetails = new List<OrderDetail>()
                 };
