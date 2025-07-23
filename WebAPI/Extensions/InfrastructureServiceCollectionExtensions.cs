@@ -106,6 +106,7 @@ namespace WebAPI.Extensions
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<ICustomerMemberShipRepository, CustomerMembershipRepository>();
             services.AddScoped<IMembershipRepository, MembershipRepository>();
+            services.AddScoped<IOrderMembershipRepository, OrderMembershipRepository>();
 
 
             services.AddScoped<ICurrentUserService, CurrentUserService>();

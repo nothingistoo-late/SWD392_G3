@@ -17,10 +17,12 @@ namespace BusinessObjects
         public Guid CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
         public DateTime OrderDate { get; set; }
+        public OrderType Type { get; set; } 
         public OrderStatus Status { get; set; }
         public double TotalPrice { get; set; }
         public string? Notes { get; set; } = null!;
-        public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        public ICollection<OrderDetail>? OrderDetails { get; set; } = new List<OrderDetail>();
+        public ICollection<OrderMembership>? OrderMemberships { get; set; } = new List<OrderMembership>();
 
 
     }

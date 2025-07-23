@@ -16,7 +16,7 @@ namespace WebAPI.Controllers
         [HttpPost("{customerId}/memberships/{membershipId}")]
         public async Task<IActionResult> AddMembershipToCustomer(Guid customerId, Guid membershipId)
         {
-            var result = await _service.AddMembershipToCustomerAsync(customerId, membershipId);
+            var result = await _service.CreateMembershipOrderAsync(customerId, membershipId);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);

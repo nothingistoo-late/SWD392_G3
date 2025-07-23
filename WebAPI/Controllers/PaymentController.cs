@@ -14,83 +14,22 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
         private readonly VnPayService _vpnPayService;
         private readonly IOrderService _orderService;
         private readonly ICustomerMembershipService _customerMemberShipService;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IMembershipService _membershipService;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICustomerService _customerService;
 
 
-        public PaymentController(ICustomerMembershipService customerMembershipService, IOrderService order ,VnPayService vpnPayService)
+        public PaymentController(ICustomerService customerService ,IUnitOfWork unit ,IMembershipService membershipService ,ICurrentUserService currentUserService ,ICustomerMembershipService customerMembershipService, IOrderService order ,VnPayService vpnPayService)
         {
             _vpnPayService = vpnPayService;
             _orderService = order;
             _customerMemberShipService = customerMembershipService;
+            _currentUserService = currentUserService;
+            _membershipService = membershipService;
+            _unitOfWork = unit;
+            _customerService = customerService;
         }
-
-        //[HttpGet("getPaymentByAdvId/{advId}")]
-        //public async Task<ActionResult<IEnumerable<VNPaymentResponseModel>>> GetPaymentByAdvId(int advId)
-        //{
-        //    var payments = await _paymentService.GetPaymentByAdvIdAsync(advId);
-
-        //    if (payments == null || !payments.Any())
-        //        return NotFound();
-
-        //    var response = payments.Select(x => new PaymentResponseModel
-        //    {
-        //        Id = x.Id,
-        //        PackageId = x.PackageId,
-        //        PostId = x.PostId,
-        //        PayDate = x.PayDate,
-        //        Description = x.Description,
-        //        TransactionId = x.TransactionId,
-        //        Success = x.Success,
-        //        Token = x.Token,
-        //    });
-
-        //    return Ok(response);
-        //}
-
-        //[HttpGet("getPaymentByPacKageId/{packageId}")]
-        //public async Task<ActionResult<IEnumerable<PaymentResponseModel>>> GetPaymentByPackageId(int packageId)
-        //{
-        //    var payments = await _paymentService.GetPaymentByPackageIdAsync(packageId);
-
-        //    if (payments == null || !payments.Any())
-        //        return NotFound();
-
-        //    var response = payments.Select(x => new PaymentResponseModel
-        //    {
-        //        Id = x.Id,
-        //        PackageId = x.PackageId,
-        //        PostId = x.PostId,
-        //        PayDate = x.PayDate,
-        //        Description = x.Description,
-        //        TransactionId = x.TransactionId,
-        //        Success = x.Success,
-        //        Token = x.Token,
-        //    });
-
-        //    return Ok(response);
-        //}
-
-        //[HttpGet("getPaymentByPaymentId/{paymentId}")]
-        //public async Task<ActionResult<IEnumerable<PaymentResponseModel>>> GetPaymentByPaymentId(int paymentId)
-        //{
-        //    var payment = await _paymentService.GetPaymentByIdAsync(paymentId);
-
-        //    if (payment == null)
-        //        return NotFound();
-
-        //    var response = new PaymentResponseModel
-        //    {
-        //        Id = payment.Id,
-        //        PackageId = payment.PackageId,
-        //        PostId = payment.PostId,
-        //        PayDate = payment.PayDate,
-        //        Description = payment.Description,
-        //        TransactionId = payment.TransactionId,
-        //        Success = payment.Success,
-        //        Token = payment.Token,
-        //    };
-
-        //    return Ok(response);
-        //}
 
         [HttpPost("createPaymentURL")]
         public async Task<ActionResult> CreatePaymentURL(PaymentRequestModel request)
@@ -113,7 +52,8 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
             PaymentInformationModel model = new()
             {
                 OrderId = order.Data.Id,
-                Amount = amout 
+                Amount = amout,
+                OrderType = request.OrderType.ToString()
             };
 
             string url = _vpnPayService.CreatePaymentUrl(model, HttpContext);
@@ -131,33 +71,22 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
             try
             {
                 var response = _vpnPayService.PaymentExecute(Request.Query);
+                var orderInfo = Request.Query["vnp_OrderInfo"];
+                var parts = orderInfo.ToString().Split(' ');
 
-                //string[] splitDescription = response.OrderDescription.Split(" ");
+                var orderId = Guid.Parse(parts[0]);
+                var orderType = parts.Length > 1 ? Guid.Parse(parts[1]) : Guid.Empty;
 
-                //var paymentModel = new PaymentModel
-                //{
-                //    PackageId = int.Parse(splitDescription[1]),
-                //    PostId = int.Parse(splitDescription[0]),
-                //    Description = response.OrderDescription,
-                //    PayDate = DateTime.Now,
-                //    TransactionId = int.Parse(response.TransactionId),
-                //    Success = response.Success,
-                //    Token = response.Token,
-                //};
+                var order = await _orderService.GetOrderByIdAsync(orderId);
+                foreach (var item in Request.Query)
+                {
+                    Console.WriteLine($"Key: {item.Key}, Value: {item.Value}");
+                }
 
-                //var advModel = new UpdateAdsModel
-                //{
-                //    PackageId = int.Parse(splitDescription[1]),
-                //    PostId = int.Parse(splitDescription[0]),
-                //    PayDate = DateTime.Now,
-                //};
-
-                //bool success = false;
-
-                //Console.WriteLine(paymentModel.PackageId + " " + paymentModel.PostId );
-                var vnpTxnRef = Request.Query["vnp_OrderInfo"];
-
-                var order = await _orderService.GetOrderByIdAsync(Guid.Parse(vnpTxnRef));
+                if (!order.IsSuccess)
+                {
+                    return NotFound("Order not found");
+                }
 
                 if (response.Success && response.TransactionId != "0")
                 {
@@ -171,7 +100,14 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
 
                     await _orderService.UpdateOrderStatusAsync(order.Data.Id, status);
 
-                    //_orderService.UpdateOrderAsync
+                    if (orderType!=Guid.Empty)
+                    {
+                       var result =  await _customerMemberShipService.CreateMembershipOrderForCustomerAsync(order.Data.CustomerId, orderType);
+                        if (!result.IsSuccess)
+                        {
+                            return BadRequest(result);
+                        }
+                    }
 
                     return Ok("Ditme mình thành tỷ phú rồi đại vương ơi!!");
                 }
@@ -182,7 +118,7 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
             catch (Exception ex)
             {
                 // Log the exception (using a logging framework)
-                return StatusCode(500, "An error occurred while processing the payment");
+                return BadRequest("An error occurred while processing the payment: "+ex.Message);
             }
         }
 

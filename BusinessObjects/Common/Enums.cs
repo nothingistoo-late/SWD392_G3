@@ -31,5 +31,11 @@
         Cancelled = 3
     }
 
+    public enum OrderType
+    {
+        Service,
+        Membership
+    }
+
 
 }

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using DTOs.CustomerMembership.Respond;
+using DTOs.OrderDTO.Respond;
+using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Interfaces;
 using Services.Commons;
@@ -18,7 +20,114 @@ namespace Services.Implementations
         public CustomerMembershipService(IMapper mapper, IGenericRepository<CustomerMembership, Guid> repository, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICurrentTime currentTime) : base(repository, currentUserService, unitOfWork, currentTime)
         {
             _mapper = mapper;
-        }        
+        }
+
+
+        public async Task<ApiResult<OrderRespondDTO>> CreateMembershipOrderAsync(Guid customerId, Guid membershipId)
+        {
+            var membership = await _unitOfWork.MembershipRepository.GetByIdAsync(membershipId);
+            if (membership == null)
+                return ApiResult<OrderRespondDTO>.Failure(new Exception("Membership not found"));
+
+            var customer = await _unitOfWork.CustomerRepository.FirstOrDefaultAsync(x => x.UserId == customerId);
+            if (customer == null)
+                return ApiResult<OrderRespondDTO>.Failure(new Exception("Customer not found"));
+
+            var order = new Order
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = customer.UserId,
+                TotalPrice = (double)membership.Price,
+                Type = OrderType.Membership,
+                Status = OrderStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await _unitOfWork.OrderRepository.AddAsync(order);
+            await _unitOfWork.SaveChangesAsync();
+
+            var result = _mapper.Map<OrderRespondDTO>(order);
+            return ApiResult<OrderRespondDTO>.Success(result, "Order created successfully.");
+
+        }
+
+
+        public async Task<ApiResult<CustomerMembershipWithOrderResponse>> CreateMembershipOrderForCustomerAsync(Guid customerId, Guid membershipId)
+        {
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+
+                var currentCustomer = _currentUserService.GetUserId();
+                //if (currentCustomer != customerId)
+                //    return ApiResult<CustomerMembershipWithOrderResponse>.Failure(new Exception("Bạn không có quyền thực hiện hành động này cho khách hàng khác."));
+
+                if (await _unitOfWork.CustomerRepository.AnyAsync(o => o.UserId == customerId) == false)
+                    return ApiResult<CustomerMembershipWithOrderResponse>.Failure(new Exception("Không tìm thấy khách hàng!! Hãy thử đăng nhập và thử lại!!"));
+
+                var membership = await _unitOfWork.MembershipRepository.GetByIdAsync(membershipId);
+
+                if (membership == null)
+                    return ApiResult<CustomerMembershipWithOrderResponse>.Failure(new Exception("Không tìm thấy gói membership."));
+
+                // 2. Gọi lại hàm AddMembershipToCustomerAsync
+                var addResult = await AddMembershipToCustomerAsync(customerId, membershipId);
+                if (!addResult.IsSuccess)
+                {
+                    await transaction.RollbackAsync();
+                    //return addResult; // trả về lỗi luôn
+                    return ApiResult<CustomerMembershipWithOrderResponse>.Failure(new Exception(addResult.Message));
+
+                }
+
+                // 1. Tạo Order mới
+                var newOrder = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    CustomerId = customerId,
+                    OrderDate = DateTime.UtcNow,
+                    Status = OrderStatus.Pending, // hoặc Paid nếu muốn tính là đã thanh toán luôn
+                    TotalPrice = (double)membership.Price, // Có thể lấy từ Membership.Price nếu muốn tính luôn
+                    Notes = "Đơn hàng mua gói Membership"
+                };
+
+                await _unitOfWork.OrderRepository.AddAsync(newOrder);
+                await _unitOfWork.SaveChangesAsync();
+
+                // 3. Tạo bản ghi OrderMembership để liên kết đơn hàng và membership
+                var orderMembership = new OrderMembership
+                {
+                    Id = Guid.NewGuid(),
+                    OrderId = newOrder.Id,
+                    MembershipId = membershipId
+                };
+
+                await _unitOfWork.OrderMembershipRepository.AddAsync(orderMembership);
+                await _unitOfWork.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                // Mapping kết quả
+                var membershipDto = _mapper.Map<CustomerMembershipResponse>(addResult.Data);
+                var orderDto = _mapper.Map<OrderResponse>(newOrder);
+
+                // Gộp lại
+                var fullResponse = new CustomerMembershipWithOrderResponse
+                {
+                    Membership = membershipDto,
+                    Order = orderDto
+                };
+
+                return ApiResult<CustomerMembershipWithOrderResponse>.Success(fullResponse, "Tạo đơn hàng và gán membership thành công.");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return ApiResult<CustomerMembershipWithOrderResponse>.Failure(new Exception("Có lỗi xảy ra khi tạo đơn hàng membership: " + ex.Message));
+            }
+        }
+
+
 
         public async Task<ApiResult<CustomerMembershipResponse>> AddMembershipToCustomerAsync(Guid customerId, Guid membershipId)
         {

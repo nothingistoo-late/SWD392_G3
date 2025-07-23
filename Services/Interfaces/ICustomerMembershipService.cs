@@ -1,4 +1,5 @@
 ﻿using DTOs.CustomerMembership.Respond;
+using DTOs.OrderDTO.Respond;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,7 @@ namespace Services.Interfaces
         Task<ApiResult<CustomerMembershipResponse>> UpdateCustomerMembershipAsync(Guid cmId, Guid newMembershipId);
         Task<ApiResult<CustomerMembershipResponse>> AddMembershipToCustomerAsync(Guid customerId, Guid membershipId);
         Task<ApiResult<CustomerMembershipResponse>> GetBestActiveMembershipByCustomerAsync(Guid customerId);
+        Task<ApiResult<CustomerMembershipWithOrderResponse>> CreateMembershipOrderForCustomerAsync(Guid customerId, Guid membershipId);
+        Task<ApiResult<OrderRespondDTO>> CreateMembershipOrderAsync(Guid customerId, Guid membershipId);
     }
 }
