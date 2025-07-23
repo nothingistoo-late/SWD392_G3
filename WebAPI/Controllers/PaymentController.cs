@@ -19,7 +19,7 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICustomerService _customerService;
 
-
+        private string UIurl = "http://localhost:3000";
         public PaymentController(ICustomerService customerService ,IUnitOfWork unit ,IMembershipService membershipService ,ICurrentUserService currentUserService ,ICustomerMembershipService customerMembershipService, IOrderService order ,VnPayService vpnPayService)
         {
             _vpnPayService = vpnPayService;
@@ -78,21 +78,14 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
                 var orderType = parts.Length > 1 ? Guid.Parse(parts[1]) : Guid.Empty;
 
                 var order = await _orderService.GetOrderByIdAsync(orderId);
-                foreach (var item in Request.Query)
-                {
-                    Console.WriteLine($"Key: {item.Key}, Value: {item.Value}");
-                }
 
                 if (!order.IsSuccess)
                 {
-                    return NotFound("Order not found");
+                    return Redirect($"{UIurl}/order-success?orderId={orderId}&success=false");
                 }
 
                 if (response.Success && response.TransactionId != "0")
                 {
-                    //success = await _paymentService.CreatePaymentAsync(paymentModel);
-                    //await _paymentService.CreatePaymentAsync(paymentModel);
-                    //await _advService.UpdateAdsPaymentAsync(advModel);
                     var status = new UpdateOrderStatusRequestDTO
                     {
                         Status = OrderStatus.Paid
@@ -100,25 +93,23 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
 
                     await _orderService.UpdateOrderStatusAsync(order.Data.Id, status);
 
-                    if (orderType!=Guid.Empty)
+                    if (orderType != Guid.Empty)
                     {
-                       var result =  await _customerMemberShipService.CreateMembershipOrderForCustomerAsync(order.Data.CustomerId, orderType);
+                        var result = await _customerMemberShipService.CreateMembershipOrderForCustomerAsync(order.Data.CustomerId, orderType);
                         if (!result.IsSuccess)
                         {
-                            return BadRequest(result);
+                            return Redirect($"{UIurl}/order-success?orderId={orderId}&success=false");
                         }
                     }
 
-                    return Ok("Ditme mình thành tỷ phú rồi đại vương ơi!!");
+                    return Redirect($"{UIurl}/order-success?orderId={orderId}&success=true");
                 }
 
-                //return Ok(response);
-                return Ok("Ditme tiền giả rồi đại vương ơi!!");
+                return Redirect($"{UIurl}/order-success?orderId={orderId}&success=false");
             }
             catch (Exception ex)
             {
-                // Log the exception (using a logging framework)
-                return BadRequest("An error occurred while processing the payment: "+ex.Message);
+                return Redirect($"{UIurl}/order-success?orderId=unknown&success=false&message={Uri.EscapeDataString(ex.Message)}");
             }
         }
 
