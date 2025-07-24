@@ -61,7 +61,8 @@ namespace Services.Implementations
 
                 // Tìm status nhỏ nhất
                 var minStatus = allDetails.Min(d => (int)d.Status);
-
+                if (minStatus != 0)
+                    minStatus--;
                 // Cập nhật trạng thái order cha
                 var order = await _unitOfWork.OrderRepository
                     .FirstOrDefaultAsync(o => o.Id == detail.OrderId);
