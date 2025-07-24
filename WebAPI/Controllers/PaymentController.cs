@@ -95,7 +95,7 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
 
                     if (orderType != Guid.Empty)
                     {
-                        var result = await _customerMemberShipService.CreateMembershipOrderForCustomerAsync(order.Data.CustomerId, orderType);
+                        var result = await _customerMemberShipService.CreateMembershipOrderForCustomerAsync(order.Data.CustomerId, orderType, orderId);
                         if (!result.IsSuccess)
                         {
                             return Redirect($"{UIurl}/membership-success?orderId={orderId}&success=false");

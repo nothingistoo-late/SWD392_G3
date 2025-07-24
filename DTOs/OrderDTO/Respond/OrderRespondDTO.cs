@@ -26,11 +26,16 @@ namespace DTOs.OrderDTO.Respond
         public string ServiceName { get; set; } = default!;
         public OrderDetailStatus Status { get; set; } 
         public string? Note { get; set; } = null!;
-        public virtual Rating? Rating { get; set; }
+        public RatingDTO? Rating { get; set; }
         public DateTime ScheduledTime { get; set; }
         public Guid StaffId { get; set; }
         public string StaffName { get; set; } = default!;
-
     }
+    public class RatingDTO
+    {
+        public int Score { get; set; }
+        public string? Comment { get; set; }
+    }
+
 
 }

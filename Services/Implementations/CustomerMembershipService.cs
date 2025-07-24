@@ -52,7 +52,7 @@ namespace Services.Implementations
         }
 
 
-        public async Task<ApiResult<CustomerMembershipWithOrderResponse>> CreateMembershipOrderForCustomerAsync(Guid customerId, Guid membershipId)
+        public async Task<ApiResult<CustomerMembershipWithOrderResponse>> CreateMembershipOrderForCustomerAsync(Guid customerId, Guid membershipId, Guid OrderId)
         {
             using var transaction = await _unitOfWork.BeginTransactionAsync();
 
@@ -81,25 +81,31 @@ namespace Services.Implementations
 
                 }
 
-                // 1. Tạo Order mới
-                var newOrder = new Order
-                {
-                    Id = Guid.NewGuid(),
-                    CustomerId = customerId,
-                    OrderDate = DateTime.UtcNow,
-                    Status = OrderStatus.Pending, // hoặc Paid nếu muốn tính là đã thanh toán luôn
-                    TotalPrice = (double)membership.Price, // Có thể lấy từ Membership.Price nếu muốn tính luôn
-                    Notes = "Đơn hàng mua gói Membership"
-                };
+                var order = await _unitOfWork.OrderRepository.GetByIdAsync(OrderId);
+                if (order == null)
+                    return ApiResult<CustomerMembershipWithOrderResponse>.Failure(new Exception("Không tìm thấy đơn hàng với id : " + OrderId));
 
-                await _unitOfWork.OrderRepository.AddAsync(newOrder);
+                // 1. Tạo Order mới
+                //var newOrder = new Order
+                //{
+                //    Id = Guid.NewGuid(),
+                //    CustomerId = customerId,
+                //    OrderDate = DateTime.UtcNow,
+                //    Status = OrderStatus.Pending, // hoặc Paid nếu muốn tính là đã thanh toán luôn
+                //    TotalPrice = (double)membership.Price, // Có thể lấy từ Membership.Price nếu muốn tính luôn
+                //    Notes = "Đơn hàng mua gói Membership"
+                //};
+
+                order.OrderDate = _currentTime.GetVietnamTime();
+                order.Status = OrderStatus.Paid; // Hoặc Paid nếu muốn tính là đã thanh toán luôn
+                order.Notes = "Đơn hàng mua gói Membership";
                 await _unitOfWork.SaveChangesAsync();
 
                 // 3. Tạo bản ghi OrderMembership để liên kết đơn hàng và membership
                 var orderMembership = new OrderMembership
                 {
                     Id = Guid.NewGuid(),
-                    OrderId = newOrder.Id,
+                    OrderId = order.Id,
                     MembershipId = membershipId
                 };
 
@@ -109,7 +115,7 @@ namespace Services.Implementations
 
                 // Mapping kết quả
                 var membershipDto = _mapper.Map<CustomerMembershipResponse>(addResult.Data);
-                var orderDto = _mapper.Map<OrderResponse>(newOrder);
+                var orderDto = _mapper.Map<OrderResponse>(order);
 
                 // Gộp lại
                 var fullResponse = new CustomerMembershipWithOrderResponse

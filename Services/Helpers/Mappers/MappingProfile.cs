@@ -38,7 +38,11 @@ namespace Services.Helpers.Mappers
                     .ForMember(dest => dest.StaffName,
                                opt => opt.MapFrom(src => src.Staff.User.FirstName + " " + src.Staff.User.LastName))
                     .ForMember(dest => dest.ScheduledTime,
-                       opt => opt.MapFrom(src => src.ScheduleTime)); // 💥 FIX CHÍNH!
+                                opt => opt.MapFrom(src => src.ScheduleTime))
+                     .ForMember(dest => dest.Rating,
+                                opt => opt.MapFrom(src => src.Rating)) // Rating → RatingDTO
+                    .ForMember(dest => dest.Note,
+                                opt => opt.MapFrom(src => src.Note)); // optional, nhưng để rõ hơn cũng good; // 💥 FIX CHÍNH!
 
             // 💥 ADD THIS: Order -> OrderRespondDTO
             CreateMap<Order, OrderRespondDTO>();
@@ -87,6 +91,7 @@ namespace Services.Helpers.Mappers
             .ForMember(dest => dest.MembershipName, opt => opt.MapFrom(src => src.Membership.Name))
             .ForMember(dest => dest.DiscountPercentage, opt => opt.MapFrom(src => src.Membership.DiscountPercentage));
             ;
+            CreateMap<Rating, RatingDTO>().ReverseMap();
 
 
         }

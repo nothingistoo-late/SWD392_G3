@@ -15,7 +15,7 @@ namespace Services.Interfaces
         Task<ApiResult<CustomerMembershipResponse>> UpdateCustomerMembershipAsync(Guid cmId, Guid newMembershipId);
         Task<ApiResult<CustomerMembershipResponse>> AddMembershipToCustomerAsync(Guid customerId, Guid membershipId);
         Task<ApiResult<CustomerMembershipResponse>> GetBestActiveMembershipByCustomerAsync(Guid customerId);
-        Task<ApiResult<CustomerMembershipWithOrderResponse>> CreateMembershipOrderForCustomerAsync(Guid customerId, Guid membershipId);
+        Task<ApiResult<CustomerMembershipWithOrderResponse>> CreateMembershipOrderForCustomerAsync(Guid customerId, Guid membershipId, Guid orderId);
         Task<ApiResult<OrderRespondDTO>> CreateMembershipOrderAsync(Guid customerId, Guid membershipId);
     }
 }
