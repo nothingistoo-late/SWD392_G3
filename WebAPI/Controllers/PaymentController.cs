@@ -76,7 +76,7 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
 
                 var orderId = Guid.Parse(parts[0]);
                 var orderType = parts.Length > 1 ? Guid.Parse(parts[1]) : Guid.Empty;
-
+                var amout = double.Parse(Request.Query["vnp_Amount"]) / 100;
                 var order = await _orderService.GetOrderByIdAsync(orderId);
 
                 if (!order.IsSuccess)
@@ -92,7 +92,7 @@ namespace SWP391.KoiCareSystemAtHome.API.Controllers
                     };
 
                     await _orderService.UpdateOrderStatusAsync(order.Data.Id, status);
-
+                    await _orderService.UpdateOrderAmout(order.Data.Id, (double)amout);
                     if (orderType != Guid.Empty)
                     {
                         var result = await _customerMemberShipService.CreateMembershipOrderForCustomerAsync(order.Data.CustomerId, orderType, orderId);

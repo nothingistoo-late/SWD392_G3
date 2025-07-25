@@ -426,6 +426,23 @@ namespace Services.Implementations
             }
         }
 
+        public async Task<ApiResult<OrderRespondDTO>> UpdateOrderAmout(Guid OrderId, double amout)
+        {
+            try
+            {
+                var order = await _repository.GetByIdAsync(OrderId);
+                if (order == null)
+                    return ApiResult<OrderRespondDTO>.Failure(new Exception("Không tìm thấy đơn hàng."));
+                order.TotalPrice = amout;
+                await _unitOfWork.SaveChangesAsync();
+                var response = _mapper.Map<OrderRespondDTO>(order);
+                return ApiResult<OrderRespondDTO>.Success(response, "Cập nhật số tiền đơn hàng thành công!");
 
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<OrderRespondDTO>.Failure(new Exception("Lỗi khi cập nhật số tiền đơn hàng: " + ex.Message));
+            }
+        }
     }
 }
